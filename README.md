@@ -37,11 +37,12 @@
   </ol>
 </details>
 
-
+### ⚠️ WORK IN PROGRESS
+Some things may not be working as intended or just not working at all, I'm doing my best 🥲
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-### ⚠️ WORK IN PROGRESS
+
 My entry to the 7th edition of Alura's back-end challenge, which consists of an API from a travel agency where users can search for possible travel locations, write reviews and attach pictures. For this project I decided to use my second language, which is Go! It has been very fun and indeed challenging to code, since it was also my first time using the Gin framework and also Uber's absolutely magical dependency injection system Fx, which made me think about Go packages a bit similar to what I'm used to in NestJS. I took heavy inspiration from several other projects and a few videos from awesome people, check out the <a href="#acknowledgments">Acknowledgments</a> section for them! But as usual I've added my own secret spice to the code as well 😉
 
 
