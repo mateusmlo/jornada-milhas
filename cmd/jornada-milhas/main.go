@@ -3,6 +3,8 @@ package main
 
 import (
 	"context"
+	"net"
+	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/controllers"
@@ -36,16 +38,26 @@ func startServer(lc fx.Lifecycle, r *routes.Router, logger config.Logger, rh con
 	logger.Info("Staring server...")
 	port := viper.GetString("SERVER_PORT")
 
-	rh.Gin.Run(":" + port)
+	srv := &http.Server{Addr: ":" + port, Handler: rh.Gin}
 
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			logger.Info("Starting server on port " + port)
+			ln, err := net.Listen("tcp", srv.Addr)
 
+			if err != nil {
+				logger.Error("Failed to start HTTP Server at", srv.Addr)
+				return err
+			}
+
+			go srv.Serve(ln) // process an incoming request in a go routine
+
+			logger.Error("Succeeded to start HTTP Server at", srv.Addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			logger.Info("Stopping server...")
+
+			srv.Shutdown(ctx)
 
 			return nil
 		},
