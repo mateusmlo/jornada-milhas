@@ -12,7 +12,6 @@ import (
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/domain"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
-	"github.com/spf13/viper"
 	"go.uber.org/fx"
 )
 
@@ -32,11 +31,11 @@ func main() {
 	app.Run()
 }
 
-func startServer(lc fx.Lifecycle, r *routes.Router, logger config.Logger, rh config.RequestHandler) {
+func startServer(lc fx.Lifecycle, r *routes.Router, logger config.Logger, rh config.RequestHandler, env config.Env) {
 	r.Setup()
 
 	logger.Info("Staring server...")
-	port := viper.GetString("SERVER_PORT")
+	port := env.ServerPort
 
 	srv := &http.Server{Addr: ":" + port, Handler: rh.Gin}
 
@@ -51,7 +50,7 @@ func startServer(lc fx.Lifecycle, r *routes.Router, logger config.Logger, rh con
 
 			go srv.Serve(ln) // process an incoming request in a go routine
 
-			logger.Error("Succeeded to start HTTP Server at", srv.Addr)
+			logger.Info("Succeeded to start HTTP Server at", srv.Addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
