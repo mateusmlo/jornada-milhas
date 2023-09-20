@@ -15,3 +15,9 @@ type BaseModel struct {
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
+
+func (bm *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
+	bm.ID = uuid.New()
+
+	return
+}

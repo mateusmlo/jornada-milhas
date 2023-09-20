@@ -1,11 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/domain"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
@@ -30,7 +29,7 @@ func (uc *UserController) GetAllUsers(ctx *gin.Context) {
 	users, err := uc.service.GetAllUsers()
 
 	if err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -45,20 +44,10 @@ func (uc *UserController) GetAllUsers(ctx *gin.Context) {
 func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 
-	id, err := uuid.Parse(paramID)
-	if err != nil {
-		uc.logger.Error(err)
+	user, err := uc.service.GetUserByUUID(paramID)
+	if err != nil && user == nil {
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
-		return
-	}
-
-	user, err := uc.service.GetUserByUUID(id)
-
-	if err != nil {
-		uc.logger.Error(err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
 		})
 		return
@@ -71,11 +60,10 @@ func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 
 // CreateUser creates new user
 func (uc *UserController) CreateUser(ctx *gin.Context) {
-	var userPayload models.User
+	var userPayload *models.User
 
-	if err := ctx.BindJSON(userPayload); err != nil {
-		uc.logger.Error(err)
-		spew.Dump(userPayload)
+	if err := ctx.BindJSON(&userPayload); err != nil {
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -84,7 +72,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 	}
 
 	if err := uc.service.CreateUser(userPayload); err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -94,5 +82,54 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"data": userPayload,
+	})
+}
+
+// UpdateUser updates user info
+func (uc *UserController) UpdateUser(ctx *gin.Context) {
+	var updateUserPayload models.UpdateUserDTO
+
+	paramID := ctx.Param("id")
+	if err := ctx.BindJSON(&updateUserPayload); err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	err := uc.service.UpdateUser(paramID, updateUserPayload)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"data": 1,
+	})
+}
+
+// DeactivateUser deactivates a user
+func (uc *UserController) DeactivateUser(ctx *gin.Context) {
+	paramID := ctx.Param("id")
+
+	res, err := uc.service.DeactivateUser(paramID)
+	if err != nil {
+		fmt.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+
+		return
+
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"data": res,
 	})
 }

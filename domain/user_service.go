@@ -6,7 +6,7 @@ import (
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 )
 
-// IUserService interface for managing user resources
+// IUserService
 type IUserService interface {
 	GetUserByUUID(id uuid.UUID) (models.User, error)
 	GetAllUsers() ([]models.User, error)
@@ -16,6 +16,7 @@ type IUserService interface {
 	DeactivateUser(id uuid.UUID) error
 }
 
+// UserService provides user resources
 type UserService struct {
 	repo repository.UserRepository
 }
@@ -35,15 +36,47 @@ func (us *UserService) GetAllUsers() ([]*models.User, error) {
 }
 
 // GetUserByUUID gets user by uuid PK
-func (us *UserService) GetUserByUUID(id uuid.UUID) (*models.User, error) {
-	user, err := us.repo.FindByUUID(id)
+func (us *UserService) GetUserByUUID(id string) (*models.User, error) {
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
 
-	return user, err
+	user, err := us.repo.FindByUUID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 // CreateUser creates new user
-func (us *UserService) CreateUser(u models.User) error {
-	err := us.repo.CreateUser(u)
+func (us *UserService) CreateUser(u *models.User) error {
+	err := us.repo.CreateUser(*u)
 
 	return err
+}
+
+// UpdateUser updates a user
+func (us *UserService) UpdateUser(id string, payload models.UpdateUserDTO) error {
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
+
+	err = us.repo.UpdateUser(userID, payload)
+
+	return err
+}
+
+// DeactivateUser deactivates a user - it does NOT delete!
+func (us *UserService) DeactivateUser(id string) (int64, error) {
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		return 0, err
+	}
+
+	res, err := us.repo.DeactivateUser(userID)
+
+	return res, err
 }

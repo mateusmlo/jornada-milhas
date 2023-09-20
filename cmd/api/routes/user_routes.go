@@ -27,5 +27,7 @@ func (r *Router) Setup() {
 	api.GET("/user", r.uc.GetAllUsers)
 	api.GET("/user/:id", r.uc.GetUserByUUID)
 	api.POST("/user", r.uc.CreateUser)
+	api.DELETE("/user/:id", r.uc.DeactivateUser)
+	api.PATCH("/user/:id", r.uc.UpdateUser)
 
 }

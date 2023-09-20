@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
@@ -65,6 +67,7 @@ func (ur *UserRepository) CreateUser(u models.User) error {
 
 	hashPassword, err := tools.HashPassword(u.Password)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -78,14 +81,60 @@ func (ur *UserRepository) CreateUser(u models.User) error {
 	}()
 
 	if err := tx.Create(&user).Error; err != nil {
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	return nil
+}
+
+// UpdateUser updates user data
+func (ur *UserRepository) UpdateUser(id uuid.UUID, u models.UpdateUserDTO) error {
+	user, err := ur.FindByUUID(id)
+	if err != nil {
+		return err
+	}
+
+	tx := ur.Database.Begin()
+
+	defer func() {
+		RecoverPanic(ur.logger)
+		tx.Rollback()
+	}()
+
+	if err := tx.Where(&user).Assign(&u).FirstOrCreate(&user).Error; err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		fmt.Println(err)
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+// DeactivateUser deactivates a user
+func (ur *UserRepository) DeactivateUser(id uuid.UUID) (int64, error) {
+	user, err := ur.FindByUUID(id)
+	if err != nil {
+		return 0, err
+	}
+
+	res := ur.Database.Delete(&user)
+	if res.Error != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected, nil
 }
