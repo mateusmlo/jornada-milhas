@@ -17,7 +17,6 @@ import (
 
 func main() {
 	uuid.EnableRandPool()
-	config.LoadEnvs()
 
 	app := fx.New(
 		config.Module,
