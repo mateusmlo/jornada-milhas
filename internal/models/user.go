@@ -1,5 +1,14 @@
 package models
 
+import (
+	"fmt"
+	"html"
+	"strings"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
+
 // User db model
 type User struct {
 	BaseModel
@@ -9,9 +18,16 @@ type User struct {
 	Testimonials []*Testimonial `gorm:"foreignKey:ID" json:"testimonials"`
 }
 
-// UpdateUserDTO fields a user is allowed to update
-type UpdateUserDTO struct {
-	Name     string `json:"name,omitempty"`
-	Email    string `json:"email,omitempty"`
-	Password string `json:"password,omitempty"`
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	u.Password = string(hashPassword)
+	u.Email = html.EscapeString(strings.TrimSpace(u.Email))
+
+	return
 }
