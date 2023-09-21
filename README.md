@@ -140,16 +140,16 @@ Mateus Oliveira - [LinkedIn](https://www.linkedin.com/in/mateusmlo/) - mateus.ml
 ## Acknowledgments
 Awesome projects and content that helped me figure things out for this little beast of a project!
 
-  Useful videos:
+Useful videos:
 * [Trying Another Way... (Dependency Injection)](https://www.youtube.com/watch?v=8Oosc55SKrM&t=508s)
 * [Go Programming – Golang Course with Bonus Projects](https://www.youtube.com/watch?v=un6ZyFkqFKo&t=10204s)
 
 
-  A template for clean code using Gin and Fx. Didn't use it for this project as I thought it would be to "overkill" for the scope:
+A template for clean code using Gin and Fx. Didn't use it for this project as I thought it would be to "overkill" for the scope:
 * [Clean Gin](https://github.com/dipeshdulal/clean-gin)
 
 
-  Below are some entries for a back-end contest held back in August here in Brazil that I've studied a lot as well:
+Below are some entries for a back-end contest held back in August here in Brazil that I've studied a lot as well:
 * [Leo Vargas' entry](https://github.com/leorcvargas/rinha-go)
 * [Isadora Souza's entry](https://github.com/isadoramsouza/rinha-de-backend-go/tree/main)
 
