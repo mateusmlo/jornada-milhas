@@ -28,12 +28,12 @@ func (r *UserRouter) Setup() {
 	public := r.rh.Gin.Group("/api")
 	public.POST("/user", r.uc.CreateUser)
 	public.GET("/user/whoami", r.md.JwtAuthMiddleware(), r.uc.CurrentUser)
+	public.PATCH("/user/:id", r.md.JwtAuthMiddleware(), r.uc.UpdateUser)
 
 	private := r.rh.Gin.Group("/api/admin")
 	private.Use(r.md.JwtAuthMiddleware())
 	private.GET("/user/:id", r.uc.GetUserByUUID)
 	private.GET("/user", r.uc.GetAllUsers)
 	private.DELETE("/user/:id", r.uc.DeactivateUser)
-	private.PATCH("/user/:id", r.uc.UpdateUser)
 
 }
