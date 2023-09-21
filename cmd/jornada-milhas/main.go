@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/controllers"
+	"github.com/mateusmlo/jornada-milhas/cmd/api/middlewares"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/routes"
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/domain"
@@ -20,6 +21,7 @@ func main() {
 
 	app := fx.New(
 		config.Module,
+		middlewares.Module,
 		controllers.Module,
 		repository.Module,
 		domain.Module,
@@ -30,8 +32,15 @@ func main() {
 	app.Run()
 }
 
-func startServer(lc fx.Lifecycle, r *routes.Router, logger config.Logger, rh config.RequestHandler, env config.Env) {
-	r.Setup()
+func startServer(
+	lc fx.Lifecycle,
+	ur *routes.UserRouter,
+	ar *routes.AuthRouter,
+	logger config.Logger,
+	rh config.RequestHandler,
+	env config.Env) {
+	ur.Setup()
+	ar.Setup()
 
 	logger.Info("Staring server...")
 	port := env.ServerPort

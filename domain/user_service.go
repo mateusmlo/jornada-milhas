@@ -2,11 +2,12 @@ package domain
 
 import (
 	"github.com/google/uuid"
+	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 )
 
-// IUserService
+// IUserService interface
 type IUserService interface {
 	GetUserByUUID(id uuid.UUID) (models.User, error)
 	GetAllUsers() ([]models.User, error)
@@ -50,15 +51,25 @@ func (us *UserService) GetUserByUUID(id string) (*models.User, error) {
 	return user, nil
 }
 
+// FindByEmail finds user by email
+func (us *UserService) FindByEmail(email string) (*models.User, error) {
+	user, err := us.repo.FindByEmail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 // CreateUser creates new user
-func (us *UserService) CreateUser(u *models.User) error {
+func (us *UserService) CreateUser(u *dto.NewUserDTO) error {
 	err := us.repo.CreateUser(*u)
 
 	return err
 }
 
 // UpdateUser updates a user
-func (us *UserService) UpdateUser(id string, payload models.UpdateUserDTO) error {
+func (us *UserService) UpdateUser(id string, payload dto.UpdateUserDTO) error {
 	userID, err := uuid.Parse(id)
 	if err != nil {
 		return err

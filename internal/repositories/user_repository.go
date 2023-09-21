@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/config"
+	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
-	"github.com/mateusmlo/jornada-milhas/tools"
 	"gorm.io/gorm"
 )
 
@@ -50,28 +50,33 @@ func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 
 	var user models.User
 
-	res := ur.Database.First(&user, id)
-	if res.Error != nil {
-		return nil, res.Error
+	if err := ur.Database.First(&user, id).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+// FindByEmail finds user by email
+func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
+	defer RecoverPanic(ur.logger)
+
+	var user models.User
+
+	if err := ur.Database.First(&user, models.User{Email: email}).Error; err != nil {
+		return nil, err
 	}
 
 	return &user, nil
 }
 
 // CreateUser creates new user
-func (ur *UserRepository) CreateUser(u models.User) error {
+func (ur *UserRepository) CreateUser(u dto.NewUserDTO) error {
 	user := models.User{
-		Name:  u.Name,
-		Email: u.Email,
+		Name:     u.Name,
+		Email:    u.Email,
+		Password: u.Password,
 	}
-
-	hashPassword, err := tools.HashPassword(u.Password)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	user.Password = hashPassword
 
 	tx := ur.Database.Begin()
 
@@ -96,7 +101,7 @@ func (ur *UserRepository) CreateUser(u models.User) error {
 }
 
 // UpdateUser updates user data
-func (ur *UserRepository) UpdateUser(id uuid.UUID, u models.UpdateUserDTO) error {
+func (ur *UserRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
 	user, err := ur.FindByUUID(id)
 	if err != nil {
 		return err

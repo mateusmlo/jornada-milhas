@@ -7,7 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/domain"
-	"github.com/mateusmlo/jornada-milhas/internal/models"
+	"github.com/mateusmlo/jornada-milhas/internal/dto"
+	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
 // UserController data
@@ -22,6 +23,28 @@ func NewUserController(userService *domain.UserService, logger config.Logger) *U
 		service: userService,
 		logger:  logger,
 	}
+}
+
+func (uc *UserController) CurrentUser(ctx *gin.Context) {
+	sub, err := tools.ExtractTokenSub(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	user, err := uc.service.GetUserByUUID(sub.String())
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 // GetAllUsers returns all registered users
@@ -60,7 +83,7 @@ func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 
 // CreateUser creates new user
 func (uc *UserController) CreateUser(ctx *gin.Context) {
-	var userPayload *models.User
+	var userPayload *dto.NewUserDTO
 
 	if err := ctx.BindJSON(&userPayload); err != nil {
 		fmt.Println(err)
@@ -87,7 +110,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 
 // UpdateUser updates user info
 func (uc *UserController) UpdateUser(ctx *gin.Context) {
-	var updateUserPayload models.UpdateUserDTO
+	var updateUserPayload dto.UpdateUserDTO
 
 	paramID := ctx.Param("id")
 	if err := ctx.BindJSON(&updateUserPayload); err != nil {
