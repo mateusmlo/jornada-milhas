@@ -145,7 +145,7 @@ Useful videos:
 * [Go Programming – Golang Course with Bonus Projects](https://www.youtube.com/watch?v=un6ZyFkqFKo&t=10204s)
 
 
-A template for clean code using Gin and Fx. Didn't use it for this project as I thought it would be to "overkill" for the scope:
+A template for clean code using Gin and Fx. Didn't use it for this project as I thought it would be too "overkill" for the scope:
 * [Clean Gin](https://github.com/dipeshdulal/clean-gin)
 
 
