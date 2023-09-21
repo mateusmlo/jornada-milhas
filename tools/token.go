@@ -50,11 +50,6 @@ func ValidateToken(ctx *gin.Context) error {
 }
 
 func ExtractToken(ctx *gin.Context) string {
-	tkn := ctx.Query("token")
-	if tkn != "" {
-		return tkn
-	}
-
 	bearerTkn := ctx.Request.Header.Get("Authorization")
 	_, tkn, hasTkn := strings.Cut(bearerTkn, " ")
 	if !hasTkn {
