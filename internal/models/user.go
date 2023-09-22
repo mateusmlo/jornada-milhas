@@ -12,10 +12,10 @@ import (
 // User db model
 type User struct {
 	BaseModel
-	Name         string         `gorm:"not null,size:100" json:"name" validate:"required"`
-	Email        string         `gorm:"not null,size 100" json:"email" validate:"required"`
-	Password     string         `gorm:"size:255,not null" json:"-" validate:"required"`
-	Testimonials []*Testimonial `gorm:"foreignKey:ID" json:"testimonials"`
+	Name     string    `gorm:"not null,size:100" json:"name" validate:"required"`
+	Email    string    `gorm:"not null,size 100" json:"email" validate:"required"`
+	Password string    `gorm:"size:255,not null" json:"-" validate:"required"`
+	Reviews  []*Review `gorm:"foreignKey:ID" json:"reviews"`
 }
 
 func (u *User) BeforeSave(tx *gorm.DB) (err error) {
