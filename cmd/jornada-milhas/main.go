@@ -58,7 +58,6 @@ func startServer(
 
 			go srv.Serve(ln) // process an incoming request in a go routine
 
-			logger.Info("Succeeded to start HTTP Server at", srv.Addr)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
