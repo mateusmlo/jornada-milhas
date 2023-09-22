@@ -9,12 +9,12 @@ import (
 
 // IUserService interface
 type IUserService interface {
-	GetUserByUUID(id uuid.UUID) (models.User, error)
-	GetAllUsers() ([]models.User, error)
-	GetUserByEmail(email string) (models.User, error)
-	CreateUser(models.User) error
-	UpdateUser(models.User) error
-	DeactivateUser(id uuid.UUID) error
+	GetUserByUUID(string) (*models.User, error)
+	GetAllUsers() ([]*models.User, error)
+	FindByEmail(email string) (*models.User, error)
+	CreateUser(dto.NewUserDTO) error
+	UpdateUser(string, dto.UpdateUserDTO) error
+	DeactivateUser(string) (int64, error)
 }
 
 // UserService provides user resources
@@ -62,8 +62,8 @@ func (us *UserService) FindByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser creates new user
-func (us *UserService) CreateUser(u *dto.NewUserDTO) error {
-	err := us.repo.CreateUser(*u)
+func (us *UserService) CreateUser(u dto.NewUserDTO) error {
+	err := us.repo.CreateUser(u)
 
 	return err
 }

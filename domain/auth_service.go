@@ -2,8 +2,8 @@ package domain
 
 import (
 	"errors"
-	"fmt"
 
+	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	"github.com/mateusmlo/jornada-milhas/tools"
@@ -18,13 +18,13 @@ type IAuthService interface {
 
 // AuthService provides authentication resources
 type AuthService struct {
-	us *UserService
+	logger config.GinLogger
 }
 
 // NewAuthService creates new auth service
-func NewAuthService(us *UserService) *AuthService {
+func NewAuthService(logger config.GinLogger) *AuthService {
 	return &AuthService{
-		us: us,
+		logger: logger,
 	}
 }
 
@@ -36,7 +36,7 @@ func (as *AuthService) CreateSession(payload dto.AuthDTO, user *models.User) (st
 
 	tkn, err := tools.GenerateJWT(user.ID)
 	if err != nil {
-		fmt.Println(err)
+		as.logger.Error(err)
 		return "", err
 	}
 

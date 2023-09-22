@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,14 +11,14 @@ import (
 
 // JWTAuthController struct
 type JWTAuthController struct {
-	logger      config.Logger
+	logger      config.GinLogger
 	authService *domain.AuthService
 	userService *domain.UserService
 }
 
 // NewJWTAuthController creates new controller
 func NewJWTAuthController(
-	logger config.Logger,
+	logger config.GinLogger,
 	authService *domain.AuthService,
 	userService *domain.UserService,
 ) JWTAuthController {
@@ -35,7 +34,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 	var payload dto.AuthDTO
 
 	if err := ctx.BindJSON(&payload); err != nil {
-		fmt.Println(err)
+		jwt.logger.Error(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -45,7 +44,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 
 	user, err := jwt.userService.FindByEmail(payload.Email)
 	if err != nil {
-		fmt.Println(err)
+		jwt.logger.Error(err)
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": err,
 		})
@@ -55,7 +54,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 
 	token, err := jwt.authService.CreateSession(payload, user)
 	if err != nil {
-		fmt.Println(err)
+		jwt.logger.Error(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": err,
 		})

@@ -10,10 +10,10 @@ type UserRouter struct {
 	rh     config.RequestHandler
 	uc     *controllers.UserController
 	md     *middlewares.JWTMiddleware
-	logger config.Logger
+	logger config.GinLogger
 }
 
-func NewUserRouter(uc *controllers.UserController, logger config.Logger, rh config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
+func NewUserRouter(uc *controllers.UserController, logger config.GinLogger, rh config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
 	return &UserRouter{
 		uc:     uc,
 		rh:     rh,

@@ -8,10 +8,10 @@ import (
 type AuthRouter struct {
 	rh     config.RequestHandler
 	ac     controllers.JWTAuthController
-	logger config.Logger
+	logger config.GinLogger
 }
 
-func NewAuthRouter(ac controllers.JWTAuthController, logger config.Logger, rh config.RequestHandler) *AuthRouter {
+func NewAuthRouter(ac controllers.JWTAuthController, logger config.GinLogger, rh config.RequestHandler) *AuthRouter {
 	return &AuthRouter{
 		rh:     rh,
 		ac:     ac,

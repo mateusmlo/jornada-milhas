@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,10 +16,10 @@ type IJWTMiddleware interface {
 
 type JWTMiddleware struct {
 	env    config.Env
-	logger config.Logger
+	logger config.GinLogger
 }
 
-func NewJWTAuthMiddleware(env config.Env, logger config.Logger) *JWTMiddleware {
+func NewJWTAuthMiddleware(env config.Env, logger config.GinLogger) *JWTMiddleware {
 	return &JWTMiddleware{
 		env:    env,
 		logger: logger,
@@ -31,7 +30,7 @@ func (m *JWTMiddleware) JwtAuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		err := tools.ValidateToken(ctx)
 		if err != nil {
-			fmt.Println(err)
+			m.logger.Error(err)
 			ctx.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Unauthorized",
 			})
