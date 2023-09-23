@@ -6,22 +6,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/domain"
+	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 )
 
 // JWTAuthController struct
 type JWTAuthController struct {
 	logger      config.Logger
-	authService *domain.AuthService
-	userService *domain.UserService
+	authService *service.AuthService
+	userService *service.UserService
 }
 
 // NewJWTAuthController creates new controller
 func NewJWTAuthController(
 	logger config.Logger,
-	authService *domain.AuthService,
-	userService *domain.UserService,
+	authService *service.AuthService,
+	userService *service.UserService,
 ) JWTAuthController {
 	return JWTAuthController{
 		logger:      logger,

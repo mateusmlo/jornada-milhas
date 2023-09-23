@@ -1,4 +1,4 @@
-package domain
+package service
 
 import "go.uber.org/fx"
 

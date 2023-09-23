@@ -11,7 +11,7 @@ import (
 	"github.com/mateusmlo/jornada-milhas/cmd/api/middlewares"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/routes"
 	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/domain"
+	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 	"go.uber.org/fx"
 )
@@ -24,7 +24,7 @@ func main() {
 		middlewares.Module,
 		controllers.Module,
 		repository.Module,
-		domain.Module,
+		service.Module,
 		routes.Module,
 		fx.Invoke(startServer),
 	)
