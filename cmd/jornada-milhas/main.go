@@ -36,11 +36,14 @@ func startServer(
 	lc fx.Lifecycle,
 	ur *routes.UserRouter,
 	ar *routes.AuthRouter,
+	rr *routes.ReviewRouter,
 	logger config.Logger,
 	rh config.RequestHandler,
-	env config.Env) {
+	env config.Env,
+) {
 	ur.Setup()
 	ar.Setup()
+	rr.Setup()
 
 	logger.Info("Staring server...")
 	port := env.ServerPort

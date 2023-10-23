@@ -50,7 +50,7 @@ func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 
 	var user models.User
 
-	if err := ur.DB.First(&user, id).Error; err != nil {
+	if err := ur.DB.Preload("Reviews").First(&user, id).Error; err != nil {
 		return nil, err
 	}
 

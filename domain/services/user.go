@@ -7,16 +7,6 @@ import (
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 )
 
-// IUserService interface
-type IUserService interface {
-	GetUserByUUID(id uuid.UUID) (models.User, error)
-	GetAllUsers() ([]models.User, error)
-	GetUserByEmail(email string) (models.User, error)
-	CreateUser(models.User) error
-	UpdateUser(models.User) error
-	DeactivateUser(id uuid.UUID) error
-}
-
 // UserService provides user resources
 type UserService struct {
 	repo repository.UserRepository
