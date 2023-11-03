@@ -17,19 +17,19 @@ func NewReviewService(r repository.ReviewRepository) *ReviewService {
 	}
 }
 
-func (rs *ReviewService) CreateReview(r *dto.NewReviewDTO) error {
-	err := rs.repo.CreateReview(*r)
+func (rs *ReviewService) CreateReview(r *dto.NewReviewDTO, userID uuid.UUID) error {
+	err := rs.repo.CreateReview(*r, userID)
 
 	return err
 }
 
-func (rs *ReviewService) FindByUUID(id string) (*models.Review, error) {
+func (rs *ReviewService) FindByUUID(id string, userID uuid.UUID) (*models.Review, error) {
 	reviewID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
 	}
 
-	review, err := rs.repo.FindByUUID(reviewID)
+	review, err := rs.repo.FindByUUID(reviewID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -37,13 +37,33 @@ func (rs *ReviewService) FindByUUID(id string) (*models.Review, error) {
 	return review, nil
 }
 
-func (rs *ReviewService) UpdateReview(id string, payload dto.UpdateReviewDTO) error {
-	reviewID, err := uuid.Parse(id)
+func (rs *ReviewService) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
+	revs, err := rs.repo.GetUserReviews(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return revs, nil
+}
+
+func (rs *ReviewService) UpdateReview(id string, payload dto.UpdateReviewDTO, userID uuid.UUID) error {
+	rID, err := uuid.Parse(id)
 	if err != nil {
 		return err
 	}
 
-	err = rs.repo.UpdateReview(reviewID, payload)
+	err = rs.repo.UpdateReview(payload, rID, userID)
 
 	return err
+}
+
+func (rs *ReviewService) DeleteReview(reviewID string, userID uuid.UUID) (int64, error) {
+	rID, err := uuid.Parse(reviewID)
+	if err != nil {
+		return 0, err
+	}
+
+	res, err := rs.repo.DeleteReview(userID, rID)
+
+	return res, err
 }

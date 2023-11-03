@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 
@@ -37,7 +38,6 @@ func startServer(
 	ur *routes.UserRouter,
 	ar *routes.AuthRouter,
 	rr *routes.ReviewRouter,
-	logger config.Logger,
 	rh config.RequestHandler,
 	env config.Env,
 ) {
@@ -45,7 +45,7 @@ func startServer(
 	ar.Setup()
 	rr.Setup()
 
-	logger.Info("Staring server...")
+	fmt.Println("\nStaring server...")
 	port := env.ServerPort
 
 	srv := &http.Server{Addr: ":" + port, Handler: rh.Gin}
@@ -55,7 +55,7 @@ func startServer(
 			ln, err := net.Listen("tcp", srv.Addr)
 
 			if err != nil {
-				logger.Error("Failed to start HTTP Server at", srv.Addr)
+				fmt.Println("Failed to start HTTP Server at", srv.Addr)
 				return err
 			}
 
@@ -64,7 +64,7 @@ func startServer(
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			logger.Info("Stopping server...")
+			fmt.Println("Stopping server...")
 
 			srv.Shutdown(ctx)
 

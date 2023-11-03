@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	"gorm.io/gorm"
@@ -12,27 +12,25 @@ import (
 
 // UserRepository DB structure
 type UserRepository struct {
-	DB     *gorm.DB
-	logger *config.GormLogger
+	DB *gorm.DB
 }
 
-func RecoverPanic(ctx context.Context, logger *config.GormLogger) {
+func RecoverPanic(ctx context.Context) {
 	if r := recover(); r != nil {
-		logger.Warn(ctx, "😵 Recovered from panic!")
+		fmt.Println(ctx, "😵 Recovered from panic!")
 	}
 }
 
 // NewUserRepository creates a new user repository
-func NewUserRepository(logger *config.GormLogger, db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{
-		DB:     db,
-		logger: logger,
+		DB: db,
 	}
 }
 
 // GetAllUsers get all registered users
 func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
-	defer RecoverPanic(ur.DB.Statement.Context, ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var users []*models.User
 
@@ -46,11 +44,11 @@ func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
 
 // FindByUUID finds user by PK
 func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
-	defer RecoverPanic(ur.DB.Statement.Context, ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
 
-	if err := ur.DB.Preload("Reviews").First(&user, id).Error; err != nil {
+	if err := ur.DB.First(&user, id).Error; err != nil {
 		return nil, err
 	}
 
@@ -59,7 +57,7 @@ func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 
 // FindByEmail finds user by email
 func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
-	defer RecoverPanic(ur.DB.Statement.Context, ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
 
@@ -81,18 +79,18 @@ func (ur *UserRepository) CreateUser(u dto.NewUserDTO) error {
 	tx := ur.DB.Begin()
 
 	defer func() {
-		RecoverPanic(tx.Statement.Context, ur.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
 	if err := tx.Create(&user).Error; err != nil {
-		ur.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		ur.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
@@ -110,18 +108,18 @@ func (ur *UserRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
 	tx := ur.DB.Begin()
 
 	defer func() {
-		RecoverPanic(tx.Statement.Context, ur.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
 	if err := tx.Where(&user).Assign(&u).FirstOrCreate(&user).Error; err != nil {
-		ur.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		ur.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}

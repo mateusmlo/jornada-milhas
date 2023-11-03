@@ -16,14 +16,12 @@ type IJWTMiddleware interface {
 }
 
 type JWTMiddleware struct {
-	env    config.Env
-	logger config.Logger
+	env config.Env
 }
 
-func NewJWTAuthMiddleware(env config.Env, logger config.Logger) *JWTMiddleware {
+func NewJWTAuthMiddleware(env config.Env) *JWTMiddleware {
 	return &JWTMiddleware{
-		env:    env,
-		logger: logger,
+		env: env,
 	}
 }
 

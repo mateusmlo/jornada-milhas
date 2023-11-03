@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mateusmlo/jornada-milhas/config"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/tools"
@@ -12,15 +12,13 @@ import (
 
 // UserController data
 type UserController struct {
-	svc    *service.UserService
-	logger config.GinLogger
+	svc *service.UserService
 }
 
 // NewUserController instantiates new user controller
-func NewUserController(userService *service.UserService, logger config.GinLogger) *UserController {
+func NewUserController(userService *service.UserService) *UserController {
 	return &UserController{
-		svc:    userService,
-		logger: logger,
+		svc: userService,
 	}
 }
 
@@ -51,7 +49,7 @@ func (uc *UserController) GetAllUsers(ctx *gin.Context) {
 	users, err := uc.svc.GetAllUsers()
 
 	if err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -68,7 +66,7 @@ func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 
 	user, err := uc.svc.GetUserByUUID(paramID)
 	if err != nil && user == nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
@@ -85,7 +83,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 	var userPayload *dto.NewUserDTO
 
 	if err := ctx.BindJSON(&userPayload); err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -94,7 +92,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 	}
 
 	if err := uc.svc.CreateUser(userPayload); err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -113,7 +111,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 
 	paramID := ctx.Param("id")
 	if err := ctx.BindJSON(&updateUserPayload); err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -123,7 +121,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 
 	err := uc.svc.UpdateUser(paramID, updateUserPayload)
 	if err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -142,7 +140,7 @@ func (uc *UserController) DeactivateUser(ctx *gin.Context) {
 
 	res, err := uc.svc.DeactivateUser(paramID)
 	if err != nil {
-		uc.logger.Error(err)
+		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})

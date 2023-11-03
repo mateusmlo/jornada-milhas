@@ -9,7 +9,7 @@ import (
 )
 
 // NewDBConnection connects to database driver
-func NewDBConnection(env Env, logger Logger) *gorm.DB {
+func NewDBConnection(env Env) *gorm.DB {
 	var err error
 
 	host := env.DBHost
@@ -24,7 +24,6 @@ func NewDBConnection(env Env, logger Logger) *gorm.DB {
 		postgres.Open(dsn),
 		&gorm.Config{
 			FullSaveAssociations: true,
-			Logger:               logger.GetGormLogger(),
 		},
 	)
 

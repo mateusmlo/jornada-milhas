@@ -1,8 +1,9 @@
 package repository
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
-	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	"gorm.io/gorm"
@@ -10,41 +11,39 @@ import (
 
 // ReviewRepository struct
 type ReviewRepository struct {
-	DB     *gorm.DB
-	logger *config.GormLogger
+	DB *gorm.DB
 }
 
 // NewReviewRepository new repo instance
-func NewReviewRepository(logger *config.GormLogger, db *gorm.DB) ReviewRepository {
+func NewReviewRepository(db *gorm.DB) ReviewRepository {
 	return ReviewRepository{
-		logger: logger,
-		DB:     db,
+		DB: db,
 	}
 }
 
 // CreateReview creates new review
-func (rr *ReviewRepository) CreateReview(r dto.NewReviewDTO) error {
+func (rr *ReviewRepository) CreateReview(r dto.NewReviewDTO, userID uuid.UUID) error {
 	review := models.Review{
 		Review: r.Review,
 		Photo:  r.Photo,
-		UserID: r.UserID,
+		UserID: userID,
 	}
 
 	tx := rr.DB.Begin()
 
 	defer func() {
-		RecoverPanic(tx.Statement.Context, rr.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
 	if err := tx.Create(&review).Error; err != nil {
-		rr.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		rr.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
@@ -52,20 +51,20 @@ func (rr *ReviewRepository) CreateReview(r dto.NewReviewDTO) error {
 	return nil
 }
 
-func (rr *ReviewRepository) FindByUUID(id uuid.UUID) (*models.Review, error) {
-	defer RecoverPanic(rr.DB.Statement.Context, rr.logger)
+func (rr *ReviewRepository) FindByUUID(id, userID uuid.UUID) (*models.Review, error) {
+	defer RecoverPanic(rr.DB.Statement.Context)
 
 	var review models.Review
 
-	if err := rr.DB.Preload("User").First(&review, id).Error; err != nil {
+	if err := rr.DB.Preload("User").Where("user_id = ? AND id = ?", userID, id).First(&review).Error; err != nil {
 		return nil, err
 	}
 
 	return &review, nil
 }
 
-func (rr *ReviewRepository) UpdateReview(id uuid.UUID, r dto.UpdateReviewDTO) error {
-	review, err := rr.FindByUUID(id)
+func (rr *ReviewRepository) UpdateReview(r dto.UpdateReviewDTO, id, userID uuid.UUID) error {
+	review, err := rr.FindByUUID(id, userID)
 	if err != nil {
 		return err
 	}
@@ -73,21 +72,47 @@ func (rr *ReviewRepository) UpdateReview(id uuid.UUID, r dto.UpdateReviewDTO) er
 	tx := rr.DB.Begin()
 
 	defer func() {
-		RecoverPanic(tx.Statement.Context, rr.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
 	if err := tx.Where(&review).Assign(&r).FirstOrCreate(&review).Error; err != nil {
-		rr.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	if err := tx.Commit().Error; err != nil {
-		rr.logger.Error(tx.Statement.Context, err.Error())
+		fmt.Println(err)
 		tx.Rollback()
 		return err
 	}
 
 	return nil
+}
+
+func (rr *ReviewRepository) DeleteReview(userID, id uuid.UUID) (int64, error) {
+	r, err := rr.FindByUUID(id, userID)
+	if err != nil {
+		return 0, err
+	}
+
+	res := rr.DB.Delete(&r)
+	if res.Error != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected, nil
+}
+
+func (rr *ReviewRepository) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
+	defer RecoverPanic(rr.DB.Statement.Context)
+
+	var reviews []models.Review
+
+	if err := rr.DB.Where("user_id = ?", userID).Find(&reviews).Error; err != nil {
+		return nil, err
+	}
+
+	return &reviews, nil
 }
