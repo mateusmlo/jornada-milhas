@@ -1,42 +1,40 @@
 package repository
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/google/uuid"
-	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	"gorm.io/gorm"
 )
 
-// UserRepository database structure
+// UserRepository DB structure
 type UserRepository struct {
-	Database *gorm.DB
-	logger   config.Logger
+	DB *gorm.DB
 }
 
-func RecoverPanic(logger config.Logger) {
+func RecoverPanic(ctx context.Context) {
 	if r := recover(); r != nil {
-		logger.Warn("😵 Recovered from panic!")
+		fmt.Println(ctx, "😵 Recovered from panic!")
 	}
 }
 
 // NewUserRepository creates a new user repository
-func NewUserRepository(logger config.Logger, db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) UserRepository {
 	return UserRepository{
-		Database: db,
-		logger:   logger,
+		DB: db,
 	}
 }
 
 // GetAllUsers get all registered users
 func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
-	defer RecoverPanic(ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var users []*models.User
 
-	res := ur.Database.Find(&users)
+	res := ur.DB.Find(&users)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -46,11 +44,11 @@ func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
 
 // FindByUUID finds user by PK
 func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
-	defer RecoverPanic(ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
 
-	if err := ur.Database.First(&user, id).Error; err != nil {
+	if err := ur.DB.First(&user, id).Error; err != nil {
 		return nil, err
 	}
 
@@ -59,11 +57,11 @@ func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 
 // FindByEmail finds user by email
 func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
-	defer RecoverPanic(ur.logger)
+	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
 
-	if err := ur.Database.First(&user, models.User{Email: email}).Error; err != nil {
+	if err := ur.DB.First(&user, models.User{Email: email}).Error; err != nil {
 		return nil, err
 	}
 
@@ -78,10 +76,10 @@ func (ur *UserRepository) CreateUser(u dto.NewUserDTO) error {
 		Password: u.Password,
 	}
 
-	tx := ur.Database.Begin()
+	tx := ur.DB.Begin()
 
 	defer func() {
-		RecoverPanic(ur.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
@@ -107,10 +105,10 @@ func (ur *UserRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
 		return err
 	}
 
-	tx := ur.Database.Begin()
+	tx := ur.DB.Begin()
 
 	defer func() {
-		RecoverPanic(ur.logger)
+		RecoverPanic(tx.Statement.Context)
 		tx.Rollback()
 	}()
 
@@ -136,7 +134,7 @@ func (ur *UserRepository) DeactivateUser(id uuid.UUID) (int64, error) {
 		return 0, err
 	}
 
-	res := ur.Database.Delete(&user)
+	res := ur.DB.Delete(&user)
 	if res.Error != nil {
 		return 0, err
 	}

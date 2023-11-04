@@ -10,8 +10,6 @@ import (
 type Env struct {
 	ServerPort  string `mapstructure:"SERVER_PORT"`
 	Environment string `mapstructure:"APP_MODE"`
-	LogOutput   string `mapstructure:"LOG_OUTPUT"`
-	LogLevel    string `mapstructure:"LOG_LEVEL"`
 	DBUsername  string `mapstructure:"DB_USER"`
 	DBPassword  string `mapstructure:"DB_PASSWORD"`
 	DBHost      string `mapstructure:"DB_HOST"`

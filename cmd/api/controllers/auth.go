@@ -5,26 +5,22 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/domain"
+	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 )
 
 // JWTAuthController struct
 type JWTAuthController struct {
-	logger      config.Logger
-	authService *domain.AuthService
-	userService *domain.UserService
+	authService *service.AuthService
+	userService *service.UserService
 }
 
 // NewJWTAuthController creates new controller
 func NewJWTAuthController(
-	logger config.Logger,
-	authService *domain.AuthService,
-	userService *domain.UserService,
+	authService *service.AuthService,
+	userService *service.UserService,
 ) JWTAuthController {
 	return JWTAuthController{
-		logger:      logger,
 		authService: authService,
 		userService: userService,
 	}
@@ -71,7 +67,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 
 // Register registers user
 func (jwt JWTAuthController) Register(c *gin.Context) {
-	jwt.logger.Info("Register route called")
+	fmt.Println("Register route called")
 	c.JSON(200, gin.H{
 		"message": "register route",
 	})

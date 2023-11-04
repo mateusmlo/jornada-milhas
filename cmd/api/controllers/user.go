@@ -5,23 +5,20 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/domain"
+	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
 // UserController data
 type UserController struct {
-	service *domain.UserService
-	logger  config.Logger
+	svc *service.UserService
 }
 
 // NewUserController instantiates new user controller
-func NewUserController(userService *domain.UserService, logger config.Logger) *UserController {
+func NewUserController(userService *service.UserService) *UserController {
 	return &UserController{
-		service: userService,
-		logger:  logger,
+		svc: userService,
 	}
 }
 
@@ -35,7 +32,7 @@ func (uc *UserController) CurrentUser(ctx *gin.Context) {
 		return
 	}
 
-	user, err := uc.service.GetUserByUUID(sub.String())
+	user, err := uc.svc.GetUserByUUID(sub.String())
 	if err != nil {
 		ctx.JSON(http.StatusForbidden, gin.H{
 			"error": err,
@@ -49,7 +46,7 @@ func (uc *UserController) CurrentUser(ctx *gin.Context) {
 
 // GetAllUsers returns all registered users
 func (uc *UserController) GetAllUsers(ctx *gin.Context) {
-	users, err := uc.service.GetAllUsers()
+	users, err := uc.svc.GetAllUsers()
 
 	if err != nil {
 		fmt.Println(err)
@@ -67,7 +64,7 @@ func (uc *UserController) GetAllUsers(ctx *gin.Context) {
 func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 
-	user, err := uc.service.GetUserByUUID(paramID)
+	user, err := uc.svc.GetUserByUUID(paramID)
 	if err != nil && user == nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -94,7 +91,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := uc.service.CreateUser(userPayload); err != nil {
+	if err := uc.svc.CreateUser(userPayload); err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -122,7 +119,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	err := uc.service.UpdateUser(paramID, updateUserPayload)
+	err := uc.svc.UpdateUser(paramID, updateUserPayload)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -141,7 +138,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 func (uc *UserController) DeactivateUser(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 
-	res, err := uc.service.DeactivateUser(paramID)
+	res, err := uc.svc.DeactivateUser(paramID)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{

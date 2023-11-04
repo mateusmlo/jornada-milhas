@@ -1,29 +1,29 @@
 package routes
 
 import (
+	"fmt"
+
 	"github.com/mateusmlo/jornada-milhas/cmd/api/controllers"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/middlewares"
 	"github.com/mateusmlo/jornada-milhas/config"
 )
 
 type UserRouter struct {
-	rh     config.RequestHandler
-	uc     *controllers.UserController
-	md     *middlewares.JWTMiddleware
-	logger config.Logger
+	rh config.RequestHandler
+	uc *controllers.UserController
+	md *middlewares.JWTMiddleware
 }
 
-func NewUserRouter(uc *controllers.UserController, logger config.Logger, rh config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
+func NewUserRouter(uc *controllers.UserController, rh config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
 	return &UserRouter{
-		uc:     uc,
-		rh:     rh,
-		logger: logger,
-		md:     md,
+		uc: uc,
+		rh: rh,
+		md: md,
 	}
 }
 
 func (r *UserRouter) Setup() {
-	r.logger.Info("Setting up user routes...")
+	fmt.Println("\nSetting up user routes...")
 
 	public := r.rh.Gin.Group("/api")
 	public.POST("/user", r.uc.CreateUser)

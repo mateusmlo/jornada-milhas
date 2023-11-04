@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/mateusmlo/jornada-milhas/cmd/api/middlewares"
 	"github.com/mateusmlo/jornada-milhas/cmd/api/routes"
 	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/domain"
+	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 	"go.uber.org/fx"
 )
@@ -24,7 +25,7 @@ func main() {
 		middlewares.Module,
 		controllers.Module,
 		repository.Module,
-		domain.Module,
+		service.Module,
 		routes.Module,
 		fx.Invoke(startServer),
 	)
@@ -36,13 +37,15 @@ func startServer(
 	lc fx.Lifecycle,
 	ur *routes.UserRouter,
 	ar *routes.AuthRouter,
-	logger config.Logger,
+	rr *routes.ReviewRouter,
 	rh config.RequestHandler,
-	env config.Env) {
+	env config.Env,
+) {
 	ur.Setup()
 	ar.Setup()
+	rr.Setup()
 
-	logger.Info("Staring server...")
+	fmt.Println("\nStaring server...")
 	port := env.ServerPort
 
 	srv := &http.Server{Addr: ":" + port, Handler: rh.Gin}
@@ -52,7 +55,7 @@ func startServer(
 			ln, err := net.Listen("tcp", srv.Addr)
 
 			if err != nil {
-				logger.Error("Failed to start HTTP Server at", srv.Addr)
+				fmt.Println("Failed to start HTTP Server at", srv.Addr)
 				return err
 			}
 
@@ -61,7 +64,7 @@ func startServer(
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			logger.Info("Stopping server...")
+			fmt.Println("Stopping server...")
 
 			srv.Shutdown(ctx)
 
