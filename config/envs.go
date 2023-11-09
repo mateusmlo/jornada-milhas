@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Env contains all environment variables as friendly props
 type Env struct {
 	ServerPort  string `mapstructure:"SERVER_PORT"`
 	Environment string `mapstructure:"APP_MODE"`
@@ -16,6 +17,8 @@ type Env struct {
 	DBPort      string `mapstructure:"DB_PORT"`
 	DBName      string `mapstructure:"DB_NAME"`
 	JWTSecret   string `mapstructure:"JWT_SECRET"`
+	RedisHost   string `mapstructure:"REDIST_HOST"`
+	RedisPort   string `mapstructure:"REDIST_PORT"`
 }
 
 // LoadEnvs loads environment variables from root .env file

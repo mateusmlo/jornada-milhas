@@ -10,12 +10,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// IAuthService interface
-type IAuthService interface {
-	Login(tkn string) (bool, error)
-	GenerateJWT(models.User) string
-}
-
 // AuthService provides authentication resources
 type AuthService struct {
 	us *UserService
