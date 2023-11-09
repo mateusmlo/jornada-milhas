@@ -1,6 +1,20 @@
 version: '3.9'
 
 services:
+  jornadas-api:
+    image: mateusmlo/jornada-milhas:v1
+    environment:
+      - GIN_MODE=release  
+    env_file:
+      - .env  
+    depends_on:
+      - db
+      - cache
+    ports:
+      - "3333:3333"
+    networks:
+      - app-network
+
   db:
     image: postgres:latest
     hostname: db
@@ -12,7 +26,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "sh -c 'pg_isready -U jm_admin -d jornada-milhas'"]
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U jornada-admin -d jornadas-db'"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -30,7 +44,7 @@ services:
     depends_on:
       - db
     networks:
-      - app-network   
+      - app-network  
 
   cache:
     hostname: cache
