@@ -48,7 +48,7 @@ This project was built on Go v1.21.0 and makes heavy use of Docker so both are m
 First of all, provide your values of choice to a `.env` file which should be a copy of the `.env.example`.
 
   ```sh
-  go get .
+  go mod download
   ```
 
 ### Installation
