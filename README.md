@@ -1,4 +1,5 @@
 [![Go](https://github.com/mateusmlo/jornada-milhas/actions/workflows/go.yml/badge.svg)](https://github.com/mateusmlo/jornada-milhas/actions/workflows/go.yml)
+[![Docker Image CI](https://github.com/mateusmlo/jornada-milhas/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mateusmlo/jornada-milhas/actions/workflows/docker-image.yml)
 <div id="top"></div>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
