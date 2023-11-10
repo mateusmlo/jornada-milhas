@@ -39,13 +39,13 @@ My entry to the 7th edition of Alura's back-end challenge, which consists of an 
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Getting this API up and running is extremely fast and simple! There are a few ways depending on what you want to do.
+Getting this API up and running is extremely fast and simple! There are a few ways depending on what you want to do: running locally and debug, or just test the endpoints.
 
 ### Prerequisites
 
 This project was built on Go v1.21.0 and makes heavy use of Docker so both are must have if you plan on running locally. If not, it is completely possible to just spin a docker-compose container and have fun.
+First of all, provide your values of choice to a `.env` file which should be a copy of the `.env.example`.
 
-* npm
   ```sh
   go get .
   ```
