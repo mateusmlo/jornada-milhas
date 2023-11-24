@@ -1,4 +1,5 @@
 [![Go](https://github.com/mateusmlo/jornada-milhas/actions/workflows/go.yml/badge.svg)](https://github.com/mateusmlo/jornada-milhas/actions/workflows/go.yml)
+[![Docker Image CI](https://github.com/mateusmlo/jornada-milhas/actions/workflows/docker-image.yml/badge.svg)](https://github.com/mateusmlo/jornada-milhas/actions/workflows/docker-image.yml)
 <div id="top"></div>
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
@@ -47,7 +48,7 @@ This project was built on Go v1.21.0 and makes heavy use of Docker so both are m
 First of all, provide your values of choice to a `.env` file which should be a copy of the `.env.example`.
 
   ```sh
-  go get .
+  go mod download
   ```
 
 ### Installation
