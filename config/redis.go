@@ -7,6 +7,7 @@ import (
 	"github.com/redis/rueidis"
 )
 
+// NewRedisConnection setup connection to cache client
 func NewRedisConnection(env *Env) *rueidis.Client {
 	rdsAddr := fmt.Sprintf("%s:%s", env.RedisHost, env.RedisPort)
 
@@ -26,7 +27,7 @@ func NewRedisConnection(env *Env) *rueidis.Client {
 		panic(err)
 	}
 
-	fmt.Println("✅ Redis client connected...")
+	fmt.Println("[CACHE] ✅ Redis client connected...")
 
 	return &cli
 }
