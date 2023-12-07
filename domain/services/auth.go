@@ -10,29 +10,30 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// AuthPayload authentication credentials payload
 type AuthPayload struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
-// AuthService provides authentication resources
-type AuthService struct {
-	us *UserService
-	rs *RefreshService
-	tu *tools.TokenUtils
+type authService struct {
+	us UserService
+	rs RefreshService
+	tu tools.TokenUtils
 }
 
 // NewAuthService creates new auth service
-func NewAuthService(us *UserService, rs *RefreshService, tu *tools.TokenUtils) *AuthService {
-	return &AuthService{
+func NewAuthService(us UserService, rs RefreshService, tu tools.TokenUtils) AuthService {
+	return &authService{
 		us: us,
 		rs: rs,
 		tu: tu,
 	}
 }
 
-func (as *AuthService) CreateSession(payload dto.AuthDTO, user *models.User) (*AuthPayload, error) {
-	validPassword := validatePasswordHash(payload.Password, user.Password)
+// CreateSession attempts to login user and returns JWT pair
+func (as *authService) CreateSession(payload dto.AuthDTO, user *models.User) (*AuthPayload, error) {
+	validPassword := as.validatePasswordHash(payload.Password, user.Password)
 	if !validPassword {
 		return nil, errors.New("Invalid email or password")
 	}
@@ -61,11 +62,12 @@ func (as *AuthService) CreateSession(payload dto.AuthDTO, user *models.User) (*A
 	}, nil
 }
 
-func (as *AuthService) Logout(user *models.User) bool {
+// Logout attempts to logout user
+func (as *authService) Logout(user *models.User) bool {
 	return as.rs.DeleteRefreshToken(user.ID.String())
 }
 
-func validatePasswordHash(password, hash string) bool {
+func (as *authService) validatePasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 
 	return err == nil

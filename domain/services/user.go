@@ -7,27 +7,26 @@ import (
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
 )
 
-// UserService provides user resources
-type UserService struct {
+type userService struct {
 	repo repository.UserRepository
 }
 
 // NewUserService creates new userService
-func NewUserService(r repository.UserRepository) *UserService {
-	return &UserService{
-		repo: r,
+func NewUserService(repo repository.UserRepository) UserService {
+	return &userService{
+		repo: repo,
 	}
 }
 
 // GetAllUsers returns all registered users
-func (us *UserService) GetAllUsers() ([]*models.User, error) {
+func (us *userService) GetAllUsers() ([]*models.User, error) {
 	users, err := us.repo.GetAllUsers()
 
 	return users, err
 }
 
 // GetUserByUUID gets user by uuid PK
-func (us *UserService) GetUserByUUID(id string) (*models.User, error) {
+func (us *userService) GetUserByUUID(id string) (*models.User, error) {
 	userID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
@@ -42,7 +41,7 @@ func (us *UserService) GetUserByUUID(id string) (*models.User, error) {
 }
 
 // FindByEmail finds user by email
-func (us *UserService) FindByEmail(email string) (*models.User, error) {
+func (us *userService) FindByEmail(email string) (*models.User, error) {
 	user, err := us.repo.FindByEmail(email)
 	if err != nil {
 		return nil, err
@@ -52,14 +51,14 @@ func (us *UserService) FindByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser creates new user
-func (us *UserService) CreateUser(u *dto.NewUserDTO) error {
-	err := us.repo.CreateUser(*u)
+func (us *userService) CreateUser(u *dto.NewUserDTO) error {
+	err := us.repo.CreateUser(u)
 
 	return err
 }
 
 // UpdateUser updates a user
-func (us *UserService) UpdateUser(id string, payload dto.UpdateUserDTO) error {
+func (us *userService) UpdateUser(id string, payload dto.UpdateUserDTO) error {
 	userID, err := uuid.Parse(id)
 	if err != nil {
 		return err
@@ -71,7 +70,7 @@ func (us *UserService) UpdateUser(id string, payload dto.UpdateUserDTO) error {
 }
 
 // DeactivateUser deactivates a user - it does NOT delete!
-func (us *UserService) DeactivateUser(id string) (int64, error) {
+func (us *userService) DeactivateUser(id string) (int64, error) {
 	userID, err := uuid.Parse(id)
 	if err != nil {
 		return 0, err
