@@ -34,7 +34,8 @@ My entry to the 7th edition of Alura's back-end challenge, which consists of an 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ### TODO
-- [ ] Add refresh tokens
+- [x] Add refresh tokens
+- [ ] (slowly) Add unit tests
 - [ ] Deploy on cloud
 
 <!-- GETTING STARTED -->
