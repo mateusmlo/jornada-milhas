@@ -5,26 +5,28 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	service "github.com/mateusmlo/jornada-milhas/domain/services"
+	services "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
-type ReviewController struct {
-	svc *service.ReviewService
-	us  *service.UserService
-	tu  *tools.TokenUtils
+type reviewController struct {
+	svc services.ReviewService
+	us  services.UserService
+	tu  tools.TokenUtils
 }
 
-func NewReviewController(rs *service.ReviewService, tu *tools.TokenUtils, us *service.UserService) *ReviewController {
-	return &ReviewController{
+// NewReviewController provides new review controller struct
+func NewReviewController(rs services.ReviewService, tu tools.TokenUtils, us services.UserService) ReviewController {
+	return &reviewController{
 		svc: rs,
 		tu:  tu,
 		us:  us,
 	}
 }
 
-func (rc *ReviewController) CreateReview(ctx *gin.Context) {
+// CreateReview creates a new location review
+func (rc *reviewController) CreateReview(ctx *gin.Context) {
 	var reviewPayload *dto.NewReviewDTO
 
 	userID, err := rc.tu.ExtractTokenSub(ctx, false)
@@ -58,7 +60,8 @@ func (rc *ReviewController) CreateReview(ctx *gin.Context) {
 	})
 }
 
-func (rc *ReviewController) GetReviewByUUID(ctx *gin.Context) {
+// GetReviewByUUID attempts to get a review by ID
+func (rc *reviewController) GetReviewByUUID(ctx *gin.Context) {
 	reviewID := ctx.Param("id")
 	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
@@ -84,7 +87,8 @@ func (rc *ReviewController) GetReviewByUUID(ctx *gin.Context) {
 	})
 }
 
-func (rc *ReviewController) GetUserReviews(ctx *gin.Context) {
+// GetUserReviews gets all reviews from a user
+func (rc *reviewController) GetUserReviews(ctx *gin.Context) {
 	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
@@ -109,7 +113,8 @@ func (rc *ReviewController) GetUserReviews(ctx *gin.Context) {
 	})
 }
 
-func (rc *ReviewController) UpdateReview(ctx *gin.Context) {
+// UpdateReview updates a review from a user
+func (rc *reviewController) UpdateReview(ctx *gin.Context) {
 	var reviewPayload *dto.UpdateReviewDTO
 
 	userID, err := rc.tu.ExtractTokenSub(ctx, false)
@@ -143,7 +148,8 @@ func (rc *ReviewController) UpdateReview(ctx *gin.Context) {
 	})
 }
 
-func (rc *ReviewController) DeleteReview(ctx *gin.Context) {
+// DeleteReview deletes a review by ID
+func (rc *reviewController) DeleteReview(ctx *gin.Context) {
 	reviewID := ctx.Param("id")
 	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {

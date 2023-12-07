@@ -10,22 +10,21 @@ import (
 	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
-// AuthController struct
-type AuthController struct {
-	as *service.AuthService
-	rs *service.RefreshService
-	us *service.UserService
-	tu *tools.TokenUtils
+type authController struct {
+	as service.AuthService
+	rs service.RefreshService
+	us service.UserService
+	tu tools.TokenUtils
 }
 
 // NewAuthController creates new controller
 func NewAuthController(
-	as *service.AuthService,
-	rs *service.RefreshService,
-	tu *tools.TokenUtils,
-	us *service.UserService,
-) *AuthController {
-	return &AuthController{
+	as service.AuthService,
+	rs service.RefreshService,
+	tu tools.TokenUtils,
+	us service.UserService,
+) AuthController {
+	return &authController{
 		as: as,
 		rs: rs,
 		tu: tu,
@@ -34,7 +33,7 @@ func NewAuthController(
 }
 
 // SignIn signs in user
-func (ac *AuthController) SignIn(ctx *gin.Context) {
+func (ac *authController) SignIn(ctx *gin.Context) {
 	var payload dto.AuthDTO
 
 	if err := ctx.BindJSON(&payload); err != nil {
@@ -72,7 +71,8 @@ func (ac *AuthController) SignIn(ctx *gin.Context) {
 	})
 }
 
-func (ac *AuthController) Logout(ctx *gin.Context) {
+// Logout logs out user
+func (ac *authController) Logout(ctx *gin.Context) {
 	sub, err := ac.tu.ExtractTokenSub(ctx, true)
 	if err != nil {
 		ctx.JSON(http.StatusForbidden, gin.H{
@@ -90,7 +90,8 @@ func (ac *AuthController) Logout(ctx *gin.Context) {
 	})
 }
 
-func (ac *AuthController) RenewRefreshToken(ctx *gin.Context) {
+// RenewRefreshToken renews user refresh token if still valid
+func (ac *authController) RenewRefreshToken(ctx *gin.Context) {
 	sub, err := ac.tu.ExtractTokenSub(ctx, true)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
