@@ -14,6 +14,7 @@ import (
 	"github.com/mateusmlo/jornada-milhas/config"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
+	"github.com/mateusmlo/jornada-milhas/tools"
 	"go.uber.org/fx"
 )
 
@@ -27,6 +28,7 @@ func main() {
 		repository.Module,
 		service.Module,
 		routes.Module,
+		tools.Module,
 		fx.Invoke(startServer),
 	)
 
@@ -38,8 +40,8 @@ func startServer(
 	ur *routes.UserRouter,
 	ar *routes.AuthRouter,
 	rr *routes.ReviewRouter,
-	rh config.RequestHandler,
-	env config.Env,
+	rh *config.RequestHandler,
+	env *config.Env,
 ) {
 	ur.Setup()
 	ar.Setup()

@@ -13,17 +13,19 @@ import (
 // UserController data
 type UserController struct {
 	svc *service.UserService
+	ut  *tools.TokenUtils
 }
 
 // NewUserController instantiates new user controller
-func NewUserController(userService *service.UserService) *UserController {
+func NewUserController(userService *service.UserService, ut *tools.TokenUtils) *UserController {
 	return &UserController{
 		svc: userService,
+		ut:  ut,
 	}
 }
 
 func (uc *UserController) CurrentUser(ctx *gin.Context) {
-	sub, err := tools.ExtractTokenSub(ctx)
+	sub, err := uc.ut.ExtractTokenSub(ctx, false)
 	if err != nil {
 		ctx.JSON(http.StatusForbidden, gin.H{
 			"error": err,

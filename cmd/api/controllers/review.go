@@ -13,11 +13,13 @@ import (
 type ReviewController struct {
 	svc *service.ReviewService
 	us  *service.UserService
+	tu  *tools.TokenUtils
 }
 
-func NewReviewController(reviewService *service.ReviewService, us *service.UserService) *ReviewController {
+func NewReviewController(rs *service.ReviewService, tu *tools.TokenUtils, us *service.UserService) *ReviewController {
 	return &ReviewController{
-		svc: reviewService,
+		svc: rs,
+		tu:  tu,
 		us:  us,
 	}
 }
@@ -25,7 +27,7 @@ func NewReviewController(reviewService *service.ReviewService, us *service.UserS
 func (rc *ReviewController) CreateReview(ctx *gin.Context) {
 	var reviewPayload *dto.NewReviewDTO
 
-	userID, err := tools.ExtractTokenSub(ctx)
+	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -58,7 +60,7 @@ func (rc *ReviewController) CreateReview(ctx *gin.Context) {
 
 func (rc *ReviewController) GetReviewByUUID(ctx *gin.Context) {
 	reviewID := ctx.Param("id")
-	userID, err := tools.ExtractTokenSub(ctx)
+	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -83,7 +85,7 @@ func (rc *ReviewController) GetReviewByUUID(ctx *gin.Context) {
 }
 
 func (rc *ReviewController) GetUserReviews(ctx *gin.Context) {
-	userID, err := tools.ExtractTokenSub(ctx)
+	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -110,7 +112,7 @@ func (rc *ReviewController) GetUserReviews(ctx *gin.Context) {
 func (rc *ReviewController) UpdateReview(ctx *gin.Context) {
 	var reviewPayload *dto.UpdateReviewDTO
 
-	userID, err := tools.ExtractTokenSub(ctx)
+	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -143,7 +145,7 @@ func (rc *ReviewController) UpdateReview(ctx *gin.Context) {
 
 func (rc *ReviewController) DeleteReview(ctx *gin.Context) {
 	reviewID := ctx.Param("id")
-	userID, err := tools.ExtractTokenSub(ctx)
+	userID, err := rc.tu.ExtractTokenSub(ctx, false)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
