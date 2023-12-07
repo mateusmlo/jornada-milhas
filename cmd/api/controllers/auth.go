@@ -7,27 +7,34 @@ import (
 	"github.com/gin-gonic/gin"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
+	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
-// JWTAuthController struct
-type JWTAuthController struct {
-	authService *service.AuthService
-	userService *service.UserService
+// AuthController struct
+type AuthController struct {
+	as *service.AuthService
+	rs *service.RefreshService
+	us *service.UserService
+	tu *tools.TokenUtils
 }
 
-// NewJWTAuthController creates new controller
-func NewJWTAuthController(
-	authService *service.AuthService,
-	userService *service.UserService,
-) JWTAuthController {
-	return JWTAuthController{
-		authService: authService,
-		userService: userService,
+// NewAuthController creates new controller
+func NewAuthController(
+	as *service.AuthService,
+	rs *service.RefreshService,
+	tu *tools.TokenUtils,
+	us *service.UserService,
+) *AuthController {
+	return &AuthController{
+		as: as,
+		rs: rs,
+		tu: tu,
+		us: us,
 	}
 }
 
 // SignIn signs in user
-func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
+func (ac *AuthController) SignIn(ctx *gin.Context) {
 	var payload dto.AuthDTO
 
 	if err := ctx.BindJSON(&payload); err != nil {
@@ -39,7 +46,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 		return
 	}
 
-	user, err := jwt.userService.FindByEmail(payload.Email)
+	user, err := ac.us.FindByEmail(payload.Email)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -49,7 +56,7 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := jwt.authService.CreateSession(payload, user)
+	token, err := ac.as.CreateSession(payload, user)
 	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusUnauthorized, gin.H{
@@ -61,14 +68,60 @@ func (jwt JWTAuthController) SignIn(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusAccepted, gin.H{
 		"message": "logged in successfully",
-		"token":   token,
+		"data":    token,
 	})
 }
 
-// Register registers user
-func (jwt JWTAuthController) Register(c *gin.Context) {
-	fmt.Println("Register route called")
-	c.JSON(200, gin.H{
-		"message": "register route",
+func (ac *AuthController) Logout(ctx *gin.Context) {
+	sub, err := ac.tu.ExtractTokenSub(ctx, true)
+	if err != nil {
+		ctx.JSON(http.StatusForbidden, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	res := ac.rs.DeleteRefreshToken(sub.String())
+
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"message": "logged out succesfully",
+		"status":  res,
+	})
+}
+
+func (ac *AuthController) RenewRefreshToken(ctx *gin.Context) {
+	sub, err := ac.tu.ExtractTokenSub(ctx, true)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	ac.rs.DeleteRefreshToken(sub.String())
+
+	newTkn, err := ac.tu.GenerateRefreshToken(sub)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	err = ac.rs.SetRefreshToken(newTkn, sub.String())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, gin.H{
+		"message":       "refresh token renewed succesfully",
+		"refresh_token": newTkn,
 	})
 }

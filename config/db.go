@@ -9,7 +9,7 @@ import (
 )
 
 // NewDBConnection connects to database driver
-func NewDBConnection(env Env) *gorm.DB {
+func NewDBConnection(env *Env) *gorm.DB {
 	var err error
 
 	host := env.DBHost

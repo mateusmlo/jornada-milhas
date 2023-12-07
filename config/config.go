@@ -7,5 +7,6 @@ var Module = fx.Options(
 	fx.Provide(NewDBConnection,
 		NewEchoHandler,
 		NewRequestHandler,
-		LoadEnvs),
+		LoadEnvs,
+		NewRedisConnection),
 )

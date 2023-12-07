@@ -9,12 +9,12 @@ import (
 )
 
 type ReviewRouter struct {
-	rh config.RequestHandler
+	rh *config.RequestHandler
 	rc *controllers.ReviewController
 	md *middlewares.JWTMiddleware
 }
 
-func NewReviewRouter(rc *controllers.ReviewController, rh config.RequestHandler, md *middlewares.JWTMiddleware) *ReviewRouter {
+func NewReviewRouter(rc *controllers.ReviewController, rh *config.RequestHandler, md *middlewares.JWTMiddleware) *ReviewRouter {
 	return &ReviewRouter{
 		rh: rh,
 		rc: rc,
@@ -26,7 +26,7 @@ func (r *ReviewRouter) Setup() {
 	fmt.Println("\nSetting up review routes...")
 
 	private := r.rh.Gin.Group("/api")
-	private.Use(r.md.JwtAuthMiddleware())
+	private.Use(r.md.ValidateAccessToken())
 	private.POST("/review", r.rc.CreateReview)
 	private.GET("/review/user", r.rc.GetUserReviews)
 	private.PUT("/review/:id", r.rc.UpdateReview)
