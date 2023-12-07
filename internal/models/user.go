@@ -12,9 +12,9 @@ import (
 // User db model
 type User struct {
 	BaseModel
-	Name     string `gorm:"not null,size:100" json:"name" validate:"required"`
-	Email    string `gorm:"not null,size 100" json:"email" validate:"required"`
-	Password string `gorm:"size:255,not null" json:"-" validate:"required"`
+	Name     string `gorm:"not null,size:100" json:"name"`
+	Email    string `gorm:"not null,size 100" json:"email"`
+	Password string `gorm:"size:70,not null" json:"-"`
 	Reviews  []*Review
 }
 
