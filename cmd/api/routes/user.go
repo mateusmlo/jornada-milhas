@@ -9,12 +9,12 @@ import (
 )
 
 type UserRouter struct {
-	rh config.RequestHandler
+	rh *config.RequestHandler
 	uc *controllers.UserController
 	md *middlewares.JWTMiddleware
 }
 
-func NewUserRouter(uc *controllers.UserController, rh config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
+func NewUserRouter(uc *controllers.UserController, rh *config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
 	return &UserRouter{
 		uc: uc,
 		rh: rh,
@@ -27,11 +27,11 @@ func (r *UserRouter) Setup() {
 
 	public := r.rh.Gin.Group("/api")
 	public.POST("/user", r.uc.CreateUser)
-	public.GET("/user/whoami", r.md.JwtAuthMiddleware(), r.uc.CurrentUser)
-	public.PATCH("/user/:id", r.md.JwtAuthMiddleware(), r.uc.UpdateUser)
+	public.GET("/user/whoami", r.md.ValidateAccessToken(), r.uc.CurrentUser)
+	public.PATCH("/user/:id", r.md.ValidateAccessToken(), r.uc.UpdateUser)
 
 	private := r.rh.Gin.Group("/api/admin")
-	private.Use(r.md.JwtAuthMiddleware())
+	private.Use(r.md.ValidateAccessToken())
 	private.GET("/user/:id", r.uc.GetUserByUUID)
 	private.GET("/user", r.uc.GetAllUsers)
 	private.DELETE("/user/:id", r.uc.DeactivateUser)

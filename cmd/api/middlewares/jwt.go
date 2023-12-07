@@ -5,29 +5,42 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/config"
 	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
-type IJWTMiddleware interface {
-	ValidateToken(ctx *gin.Context) error
-	ExtractTokenSub(ctx *gin.Context) (uuid.UUID, error)
-}
-
 type JWTMiddleware struct {
-	env config.Env
+	env *config.Env
+	tu  *tools.TokenUtils
 }
 
-func NewJWTAuthMiddleware(env config.Env) *JWTMiddleware {
+func NewJWTAuthMiddleware(env *config.Env, tu *tools.TokenUtils) *JWTMiddleware {
 	return &JWTMiddleware{
 		env: env,
+		tu:  tu,
 	}
 }
 
-func (m *JWTMiddleware) JwtAuthMiddleware() gin.HandlerFunc {
+func (m *JWTMiddleware) ValidateAccessToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		err := tools.ValidateToken(ctx)
+		err := m.tu.ValidateAccessToken(ctx)
+		if err != nil {
+			fmt.Println(err)
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			ctx.Abort()
+
+			return
+		}
+
+		ctx.Next()
+	}
+}
+
+func (m *JWTMiddleware) ValidateRefreshToken() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		err := m.tu.ValidateRefreshToken(ctx)
 		if err != nil {
 			fmt.Println(err)
 			ctx.JSON(http.StatusUnauthorized, gin.H{
