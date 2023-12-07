@@ -7,9 +7,9 @@ type RequestHandler struct {
 }
 
 // NewRequestHandler creates new req handler
-func NewRequestHandler() RequestHandler {
+func NewRequestHandler() *RequestHandler {
 	eng := gin.New()
 	eng.Use(gin.Logger(), gin.Recovery())
 
-	return RequestHandler{Gin: eng}
+	return &RequestHandler{Gin: eng}
 }
