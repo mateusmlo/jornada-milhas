@@ -9,20 +9,23 @@ import (
 
 // Env contains all environment variables as friendly props
 type Env struct {
-	ServerPort  string `mapstructure:"SERVER_PORT"`
-	Environment string `mapstructure:"APP_MODE"`
-	DBUsername  string `mapstructure:"DB_USER"`
-	DBPassword  string `mapstructure:"DB_PASSWORD"`
-	DBHost      string `mapstructure:"DB_HOST"`
-	DBPort      string `mapstructure:"DB_PORT"`
-	DBName      string `mapstructure:"DB_NAME"`
-	JWTSecret   string `mapstructure:"JWT_SECRET"`
-	RedisHost   string `mapstructure:"REDIST_HOST"`
-	RedisPort   string `mapstructure:"REDIST_PORT"`
+	ServerPort         string `mapstructure:"SERVER_PORT"`
+	Environment        string `mapstructure:"APP_MODE"`
+	DBUsername         string `mapstructure:"DB_USER"`
+	DBPassword         string `mapstructure:"DB_PASSWORD"`
+	DBHost             string `mapstructure:"DB_HOST"`
+	DBPort             string `mapstructure:"DB_PORT"`
+	DBName             string `mapstructure:"DB_NAME"`
+	AccessTokenSecret  string `mapstructure:"ACCESS_TOKEN_SECRET"`
+	AccessTokenTTL     string `mapstructure:"ACCESS_TOKEN_TTL"`
+	RefreshTokenSecret string `mapstructure:"REFRESH_SECRET"`
+	RefreshTokenTTL    string `mapstructure:"REFRESH_TTL"`
+	RedisHost          string `mapstructure:"REDIS_HOST"`
+	RedisPort          string `mapstructure:"REDIS_PORT"`
 }
 
 // LoadEnvs loads environment variables from root .env file
-func LoadEnvs() Env {
+func LoadEnvs() *Env {
 	env := Env{}
 	viper.SetConfigFile(".env")
 
@@ -36,5 +39,5 @@ func LoadEnvs() Env {
 		log.Fatal("☠️ failed to load envs")
 	}
 
-	return env
+	return &env
 }
