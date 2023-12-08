@@ -11,10 +11,10 @@ import (
 
 type JWTMiddleware struct {
 	env *config.Env
-	tu  *tools.TokenUtils
+	tu  tools.TokenUtils
 }
 
-func NewJWTAuthMiddleware(env *config.Env, tu *tools.TokenUtils) *JWTMiddleware {
+func NewJWTAuthMiddleware(env *config.Env, tu tools.TokenUtils) AuthMiddleware {
 	return &JWTMiddleware{
 		env: env,
 		tu:  tu,

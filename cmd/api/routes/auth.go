@@ -10,11 +10,15 @@ import (
 
 type AuthRouter struct {
 	rh *config.RequestHandler
-	ac *controllers.AuthController
-	md *middlewares.JWTMiddleware
+	ac controllers.AuthController
+	md middlewares.AuthMiddleware
 }
 
-func NewAuthRouter(ac *controllers.AuthController, md *middlewares.JWTMiddleware, rh *config.RequestHandler) *AuthRouter {
+func NewAuthRouter(
+	ac controllers.AuthController,
+	md middlewares.AuthMiddleware,
+	rh *config.RequestHandler,
+) *AuthRouter {
 	return &AuthRouter{
 		rh: rh,
 		md: md,
@@ -22,12 +26,12 @@ func NewAuthRouter(ac *controllers.AuthController, md *middlewares.JWTMiddleware
 	}
 }
 
-func (r *AuthRouter) Setup() {
+func (r *AuthRouter) SetupRoutes() {
 	fmt.Println("\nSetting up auth routes...")
 
-	api := r.rh.Gin.Group("/api/auth")
+	api := r.rh.Gin.Group("/v1/auth")
 
 	api.POST("/login", r.ac.SignIn)
 	api.GET("/logout", r.md.ValidateRefreshToken(), r.ac.Logout)
-	api.GET("/refresh", r.md.ValidateRefreshToken(), r.ac.RenewRefreshToken)
+	api.GET("/refresh", r.md.ValidateRefreshToken(), r.ac.RenewTokenPair)
 }

@@ -90,8 +90,8 @@ func (ac *authController) Logout(ctx *gin.Context) {
 	})
 }
 
-// RenewRefreshToken renews user refresh token if still valid
-func (ac *authController) RenewRefreshToken(ctx *gin.Context) {
+// RenewRefreshToken renews user token pair if refresh still valid
+func (ac *authController) RenewTokenPair(ctx *gin.Context) {
 	sub, err := ac.tu.ExtractTokenSub(ctx, true)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -103,7 +103,7 @@ func (ac *authController) RenewRefreshToken(ctx *gin.Context) {
 
 	ac.rs.DeleteRefreshToken(sub.String())
 
-	newTkn, err := ac.tu.GenerateRefreshToken(sub)
+	newAccessTkn, newRefreshTkn, err := ac.as.GenerateTokenPair(sub)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -112,7 +112,7 @@ func (ac *authController) RenewRefreshToken(ctx *gin.Context) {
 		return
 	}
 
-	err = ac.rs.SetRefreshToken(newTkn, sub.String())
+	err = ac.rs.SetRefreshToken(newRefreshTkn, sub.String())
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -122,7 +122,8 @@ func (ac *authController) RenewRefreshToken(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusAccepted, gin.H{
-		"message":       "refresh token renewed succesfully",
-		"refresh_token": newTkn,
+		"message":       "token renewed succesfully",
+		"access_token":  newAccessTkn,
+		"refresh_token": newRefreshTkn,
 	})
 }

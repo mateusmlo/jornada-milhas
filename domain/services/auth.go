@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
 	"github.com/mateusmlo/jornada-milhas/tools"
@@ -38,13 +39,7 @@ func (as *authService) CreateSession(payload dto.AuthDTO, user *models.User) (*A
 		return nil, errors.New("Invalid email or password")
 	}
 
-	tkn, err := as.tu.GenerateAccessToken(user.ID)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	rTkn, err := as.tu.GenerateRefreshToken(user.ID)
+	aTkn, rTkn, err := as.GenerateTokenPair(user.ID)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
@@ -57,7 +52,7 @@ func (as *authService) CreateSession(payload dto.AuthDTO, user *models.User) (*A
 	}
 
 	return &AuthPayload{
-		AccessToken:  tkn,
+		AccessToken:  aTkn,
 		RefreshToken: rTkn,
 	}, nil
 }
@@ -71,4 +66,20 @@ func (as *authService) validatePasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 
 	return err == nil
+}
+
+func (as *authService) GenerateTokenPair(userID uuid.UUID) (string, string, error) {
+	tkn, err := as.tu.GenerateAccessToken(userID)
+	if err != nil {
+		fmt.Println(err)
+		return "", "", err
+	}
+
+	rTkn, err := as.tu.GenerateRefreshToken(userID)
+	if err != nil {
+		fmt.Println(err)
+		return "", "", err
+	}
+
+	return tkn, rTkn, nil
 }
