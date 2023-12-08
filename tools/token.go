@@ -12,17 +12,18 @@ import (
 	"github.com/mateusmlo/jornada-milhas/config"
 )
 
-type TokenUtils struct {
+type tokenUtils struct {
 	env *config.Env
 }
 
-func NewTokenUtils(env *config.Env) *TokenUtils {
-	return &TokenUtils{
+// NewTokenUtils creates new JWT utils struct
+func NewTokenUtils(env *config.Env) TokenUtils {
+	return &tokenUtils{
 		env: env,
 	}
 }
 
-func (tu *TokenUtils) GenerateAccessToken(userID uuid.UUID) (string, error) {
+func (tu *tokenUtils) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	ttl, err := strconv.Atoi(tu.env.AccessTokenTTL)
 	if err != nil {
 		fmt.Println(err)
@@ -42,7 +43,7 @@ func (tu *TokenUtils) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	return tkn.SignedString([]byte(tu.env.AccessTokenSecret))
 }
 
-func (tu *TokenUtils) GenerateRefreshToken(userID uuid.UUID) (string, error) {
+func (tu *tokenUtils) GenerateRefreshToken(userID uuid.UUID) (string, error) {
 	ttl, err := strconv.Atoi(tu.env.RefreshTokenTTL)
 	if err != nil {
 		fmt.Println(err)
@@ -62,7 +63,7 @@ func (tu *TokenUtils) GenerateRefreshToken(userID uuid.UUID) (string, error) {
 	return tkn.SignedString([]byte(tu.env.RefreshTokenSecret))
 }
 
-func (tu *TokenUtils) ValidateAccessToken(ctx *gin.Context) error {
+func (tu *tokenUtils) ValidateAccessToken(ctx *gin.Context) error {
 	tkn := tu.ExtractToken(ctx)
 
 	_, err := jwt.Parse(tkn, func(token *jwt.Token) (interface{}, error) {
@@ -79,7 +80,7 @@ func (tu *TokenUtils) ValidateAccessToken(ctx *gin.Context) error {
 	return nil
 }
 
-func (tu *TokenUtils) ValidateRefreshToken(ctx *gin.Context) error {
+func (tu *tokenUtils) ValidateRefreshToken(ctx *gin.Context) error {
 	tkn := tu.ExtractToken(ctx)
 
 	_, err := jwt.Parse(tkn, func(token *jwt.Token) (interface{}, error) {
@@ -96,7 +97,7 @@ func (tu *TokenUtils) ValidateRefreshToken(ctx *gin.Context) error {
 	return nil
 }
 
-func (tu *TokenUtils) ExtractToken(ctx *gin.Context) string {
+func (tu *tokenUtils) ExtractToken(ctx *gin.Context) string {
 	bearerTkn := ctx.Request.Header.Get("Authorization")
 	_, tkn, hasTkn := strings.Cut(bearerTkn, " ")
 	if !hasTkn {
@@ -106,7 +107,7 @@ func (tu *TokenUtils) ExtractToken(ctx *gin.Context) string {
 	return tkn
 }
 
-func (tu *TokenUtils) ExtractTokenSub(ctx *gin.Context, isRefresh bool) (uuid.UUID, error) {
+func (tu *tokenUtils) ExtractTokenSub(ctx *gin.Context, isRefresh bool) (uuid.UUID, error) {
 	tkn := tu.ExtractToken(ctx)
 
 	token, err := jwt.Parse(tkn, func(tkn *jwt.Token) (interface{}, error) {

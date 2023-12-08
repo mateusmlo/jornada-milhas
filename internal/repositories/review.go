@@ -10,19 +10,19 @@ import (
 )
 
 // ReviewRepository struct
-type ReviewRepository struct {
+type reviewRepository struct {
 	DB *gorm.DB
 }
 
 // NewReviewRepository new repo instance
 func NewReviewRepository(db *gorm.DB) ReviewRepository {
-	return ReviewRepository{
+	return &reviewRepository{
 		DB: db,
 	}
 }
 
 // CreateReview creates new review
-func (rr *ReviewRepository) CreateReview(r dto.NewReviewDTO, userID uuid.UUID) error {
+func (rr *reviewRepository) CreateReview(r dto.NewReviewDTO, userID uuid.UUID) error {
 	review := models.Review{
 		Review: r.Review,
 		Photo:  r.Photo,
@@ -51,7 +51,7 @@ func (rr *ReviewRepository) CreateReview(r dto.NewReviewDTO, userID uuid.UUID) e
 	return nil
 }
 
-func (rr *ReviewRepository) FindByUUID(id, userID uuid.UUID) (*models.Review, error) {
+func (rr *reviewRepository) FindByUUID(id, userID uuid.UUID) (*models.Review, error) {
 	defer RecoverPanic(rr.DB.Statement.Context)
 
 	var review models.Review
@@ -63,7 +63,7 @@ func (rr *ReviewRepository) FindByUUID(id, userID uuid.UUID) (*models.Review, er
 	return &review, nil
 }
 
-func (rr *ReviewRepository) UpdateReview(r dto.UpdateReviewDTO, id, userID uuid.UUID) error {
+func (rr *reviewRepository) UpdateReview(r dto.UpdateReviewDTO, id, userID uuid.UUID) error {
 	review, err := rr.FindByUUID(id, userID)
 	if err != nil {
 		return err
@@ -91,7 +91,7 @@ func (rr *ReviewRepository) UpdateReview(r dto.UpdateReviewDTO, id, userID uuid.
 	return nil
 }
 
-func (rr *ReviewRepository) DeleteReview(userID, id uuid.UUID) (int64, error) {
+func (rr *reviewRepository) DeleteReview(userID, id uuid.UUID) (int64, error) {
 	r, err := rr.FindByUUID(id, userID)
 	if err != nil {
 		return 0, err
@@ -105,12 +105,12 @@ func (rr *ReviewRepository) DeleteReview(userID, id uuid.UUID) (int64, error) {
 	return res.RowsAffected, nil
 }
 
-func (rr *ReviewRepository) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
+func (rr *reviewRepository) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
 	defer RecoverPanic(rr.DB.Statement.Context)
 
 	var reviews []models.Review
 
-	if err := rr.DB.Where("user_id = ?", userID).Find(&reviews).Error; err != nil {
+	if err := rr.DB.Preload("User").Where("user_id = ?", userID).Find(&reviews).Error; err != nil {
 		return nil, err
 	}
 

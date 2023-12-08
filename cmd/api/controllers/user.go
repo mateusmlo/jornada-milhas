@@ -10,21 +10,21 @@ import (
 	"github.com/mateusmlo/jornada-milhas/tools"
 )
 
-// UserController data
-type UserController struct {
-	svc *service.UserService
-	ut  *tools.TokenUtils
+type userController struct {
+	svc service.UserService
+	ut  tools.TokenUtils
 }
 
 // NewUserController instantiates new user controller
-func NewUserController(userService *service.UserService, ut *tools.TokenUtils) *UserController {
-	return &UserController{
+func NewUserController(userService service.UserService, ut tools.TokenUtils) UserController {
+	return &userController{
 		svc: userService,
 		ut:  ut,
 	}
 }
 
-func (uc *UserController) CurrentUser(ctx *gin.Context) {
+// CurrentUser returns informatio on current loged user
+func (uc *userController) CurrentUser(ctx *gin.Context) {
 	sub, err := uc.ut.ExtractTokenSub(ctx, false)
 	if err != nil {
 		ctx.JSON(http.StatusForbidden, gin.H{
@@ -47,7 +47,7 @@ func (uc *UserController) CurrentUser(ctx *gin.Context) {
 }
 
 // GetAllUsers returns all registered users
-func (uc *UserController) GetAllUsers(ctx *gin.Context) {
+func (uc *userController) GetAllUsers(ctx *gin.Context) {
 	users, err := uc.svc.GetAllUsers()
 
 	if err != nil {
@@ -63,7 +63,7 @@ func (uc *UserController) GetAllUsers(ctx *gin.Context) {
 }
 
 // GetUserByUUID gets one user by UUID
-func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
+func (uc *userController) GetUserByUUID(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 
 	user, err := uc.svc.GetUserByUUID(paramID)
@@ -81,7 +81,7 @@ func (uc *UserController) GetUserByUUID(ctx *gin.Context) {
 }
 
 // CreateUser creates new user
-func (uc *UserController) CreateUser(ctx *gin.Context) {
+func (uc *userController) CreateUser(ctx *gin.Context) {
 	var userPayload *dto.NewUserDTO
 
 	if err := ctx.BindJSON(&userPayload); err != nil {
@@ -108,7 +108,7 @@ func (uc *UserController) CreateUser(ctx *gin.Context) {
 }
 
 // UpdateUser updates user info
-func (uc *UserController) UpdateUser(ctx *gin.Context) {
+func (uc *userController) UpdateUser(ctx *gin.Context) {
 	var updateUserPayload dto.UpdateUserDTO
 
 	paramID := ctx.Param("id")
@@ -137,7 +137,7 @@ func (uc *UserController) UpdateUser(ctx *gin.Context) {
 }
 
 // DeactivateUser deactivates a user
-func (uc *UserController) DeactivateUser(ctx *gin.Context) {
+func (uc *userController) DeactivateUser(ctx *gin.Context) {
 	paramID := ctx.Param("id")
 
 	res, err := uc.svc.DeactivateUser(paramID)

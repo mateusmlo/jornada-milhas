@@ -4,26 +4,27 @@ import (
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
-	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
+	repo "github.com/mateusmlo/jornada-milhas/internal/repositories"
 )
 
-type ReviewService struct {
-	repo repository.ReviewRepository
+type reviewService struct {
+	repo repo.ReviewRepository
 }
 
-func NewReviewService(r repository.ReviewRepository) *ReviewService {
-	return &ReviewService{
+// NewReviewService returns new service instance
+func NewReviewService(r repo.ReviewRepository) ReviewService {
+	return &reviewService{
 		repo: r,
 	}
 }
 
-func (rs *ReviewService) CreateReview(r *dto.NewReviewDTO, userID uuid.UUID) error {
+func (rs *reviewService) CreateReview(r *dto.NewReviewDTO, userID uuid.UUID) error {
 	err := rs.repo.CreateReview(*r, userID)
 
 	return err
 }
 
-func (rs *ReviewService) FindByUUID(id string, userID uuid.UUID) (*models.Review, error) {
+func (rs *reviewService) FindByUUID(id string, userID uuid.UUID) (*models.Review, error) {
 	reviewID, err := uuid.Parse(id)
 	if err != nil {
 		return nil, err
@@ -37,7 +38,7 @@ func (rs *ReviewService) FindByUUID(id string, userID uuid.UUID) (*models.Review
 	return review, nil
 }
 
-func (rs *ReviewService) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
+func (rs *reviewService) GetUserReviews(userID uuid.UUID) (*[]models.Review, error) {
 	revs, err := rs.repo.GetUserReviews(userID)
 	if err != nil {
 		return nil, err
@@ -46,7 +47,7 @@ func (rs *ReviewService) GetUserReviews(userID uuid.UUID) (*[]models.Review, err
 	return revs, nil
 }
 
-func (rs *ReviewService) UpdateReview(id string, payload dto.UpdateReviewDTO, userID uuid.UUID) error {
+func (rs *reviewService) UpdateReview(id string, payload dto.UpdateReviewDTO, userID uuid.UUID) error {
 	rID, err := uuid.Parse(id)
 	if err != nil {
 		return err
@@ -57,7 +58,7 @@ func (rs *ReviewService) UpdateReview(id string, payload dto.UpdateReviewDTO, us
 	return err
 }
 
-func (rs *ReviewService) DeleteReview(reviewID string, userID uuid.UUID) (int64, error) {
+func (rs *reviewService) DeleteReview(reviewID string, userID uuid.UUID) (int64, error) {
 	rID, err := uuid.Parse(reviewID)
 	if err != nil {
 		return 0, err

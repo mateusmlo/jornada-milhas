@@ -12,13 +12,7 @@ import (
 func NewDBConnection(env *Env) *gorm.DB {
 	var err error
 
-	host := env.DBHost
-	username := env.DBUsername
-	password := env.DBPassword
-	dbName := env.DBName
-	port := env.DBPort
-
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo", host, username, password, dbName, port)
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=America/Sao_Paulo", env.DBHost, env.DBUsername, env.DBPassword, env.DBName, env.DBPort)
 
 	DB, err := gorm.Open(
 		postgres.Open(dsn),
@@ -30,7 +24,7 @@ func NewDBConnection(env *Env) *gorm.DB {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println("Successfully connected to the database")
+		fmt.Println("[DB]            ✅ Successfully connected to the database")
 	}
 
 	DB.AutoMigrate(models.Review{}, models.User{})

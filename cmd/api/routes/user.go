@@ -10,11 +10,15 @@ import (
 
 type UserRouter struct {
 	rh *config.RequestHandler
-	uc *controllers.UserController
-	md *middlewares.JWTMiddleware
+	uc controllers.UserController
+	md middlewares.AuthMiddleware
 }
 
-func NewUserRouter(uc *controllers.UserController, rh *config.RequestHandler, md *middlewares.JWTMiddleware) *UserRouter {
+func NewUserRouter(
+	uc controllers.UserController,
+	rh *config.RequestHandler,
+	md middlewares.AuthMiddleware,
+) *UserRouter {
 	return &UserRouter{
 		uc: uc,
 		rh: rh,
@@ -22,18 +26,17 @@ func NewUserRouter(uc *controllers.UserController, rh *config.RequestHandler, md
 	}
 }
 
-func (r *UserRouter) Setup() {
+func (r *UserRouter) SetupRoutes() {
 	fmt.Println("\nSetting up user routes...")
 
-	public := r.rh.Gin.Group("/api")
-	public.POST("/user", r.uc.CreateUser)
-	public.GET("/user/whoami", r.md.ValidateAccessToken(), r.uc.CurrentUser)
-	public.PATCH("/user/:id", r.md.ValidateAccessToken(), r.uc.UpdateUser)
+	public := r.rh.Gin.Group("/v1/user")
+	public.POST("/register", r.uc.CreateUser)
+	public.GET("/whoami", r.md.ValidateAccessToken(), r.uc.CurrentUser)
+	public.PATCH("/:id", r.md.ValidateAccessToken(), r.uc.UpdateUser)
 
-	private := r.rh.Gin.Group("/api/admin")
+	private := r.rh.Gin.Group("/v1/admin")
 	private.Use(r.md.ValidateAccessToken())
 	private.GET("/user/:id", r.uc.GetUserByUUID)
 	private.GET("/user", r.uc.GetAllUsers)
 	private.DELETE("/user/:id", r.uc.DeactivateUser)
-
 }

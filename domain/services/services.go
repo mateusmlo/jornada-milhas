@@ -1,3 +1,4 @@
+// Package service contains all business logic related files
 package service
 
 import "go.uber.org/fx"

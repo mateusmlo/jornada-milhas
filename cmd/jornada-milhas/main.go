@@ -43,9 +43,9 @@ func startServer(
 	rh *config.RequestHandler,
 	env *config.Env,
 ) {
-	ur.Setup()
-	ar.Setup()
-	rr.Setup()
+	ur.SetupRoutes()
+	ar.SetupRoutes()
+	rr.SetupRoutes()
 
 	fmt.Println("\nStaring server...")
 	port := env.ServerPort

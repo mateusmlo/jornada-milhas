@@ -11,7 +11,7 @@ import (
 )
 
 // UserRepository DB structure
-type UserRepository struct {
+type userRepository struct {
 	DB *gorm.DB
 }
 
@@ -23,13 +23,13 @@ func RecoverPanic(ctx context.Context) {
 
 // NewUserRepository creates a new user repository
 func NewUserRepository(db *gorm.DB) UserRepository {
-	return UserRepository{
+	return &userRepository{
 		DB: db,
 	}
 }
 
 // GetAllUsers get all registered users
-func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
+func (ur *userRepository) GetAllUsers() ([]*models.User, error) {
 	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var users []*models.User
@@ -43,7 +43,7 @@ func (ur *UserRepository) GetAllUsers() ([]*models.User, error) {
 }
 
 // FindByUUID finds user by PK
-func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
+func (ur *userRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
@@ -56,7 +56,7 @@ func (ur *UserRepository) FindByUUID(id uuid.UUID) (*models.User, error) {
 }
 
 // FindByEmail finds user by email
-func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
+func (ur *userRepository) FindByEmail(email string) (*models.User, error) {
 	defer RecoverPanic(ur.DB.Statement.Context)
 
 	var user models.User
@@ -69,7 +69,7 @@ func (ur *UserRepository) FindByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser creates new user
-func (ur *UserRepository) CreateUser(u dto.NewUserDTO) error {
+func (ur *userRepository) CreateUser(u *dto.NewUserDTO) error {
 	user := models.User{
 		Name:     u.Name,
 		Email:    u.Email,
@@ -99,7 +99,7 @@ func (ur *UserRepository) CreateUser(u dto.NewUserDTO) error {
 }
 
 // UpdateUser updates user data
-func (ur *UserRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
+func (ur *userRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
 	user, err := ur.FindByUUID(id)
 	if err != nil {
 		return err
@@ -128,7 +128,7 @@ func (ur *UserRepository) UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error {
 }
 
 // DeactivateUser deactivates a user
-func (ur *UserRepository) DeactivateUser(id uuid.UUID) (int64, error) {
+func (ur *userRepository) DeactivateUser(id uuid.UUID) (int64, error) {
 	user, err := ur.FindByUUID(id)
 	if err != nil {
 		return 0, err

@@ -10,11 +10,15 @@ import (
 
 type ReviewRouter struct {
 	rh *config.RequestHandler
-	rc *controllers.ReviewController
-	md *middlewares.JWTMiddleware
+	rc controllers.ReviewController
+	md middlewares.AuthMiddleware
 }
 
-func NewReviewRouter(rc *controllers.ReviewController, rh *config.RequestHandler, md *middlewares.JWTMiddleware) *ReviewRouter {
+func NewReviewRouter(
+	rc controllers.ReviewController,
+	rh *config.RequestHandler,
+	md middlewares.AuthMiddleware,
+) *ReviewRouter {
 	return &ReviewRouter{
 		rh: rh,
 		rc: rc,
@@ -22,13 +26,13 @@ func NewReviewRouter(rc *controllers.ReviewController, rh *config.RequestHandler
 	}
 }
 
-func (r *ReviewRouter) Setup() {
+func (r *ReviewRouter) SetupRoutes() {
 	fmt.Println("\nSetting up review routes...")
 
-	private := r.rh.Gin.Group("/api")
+	private := r.rh.Gin.Group("/v1/review")
 	private.Use(r.md.ValidateAccessToken())
-	private.POST("/review", r.rc.CreateReview)
-	private.GET("/review/user", r.rc.GetUserReviews)
-	private.PUT("/review/:id", r.rc.UpdateReview)
-	private.DELETE("/review/:id", r.rc.DeleteReview)
+	private.POST("/", r.rc.CreateReview)
+	private.GET("/user", r.rc.GetUserReviews)
+	private.PUT("/:id", r.rc.UpdateReview)
+	private.DELETE("/:id", r.rc.DeleteReview)
 }
