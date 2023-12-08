@@ -110,7 +110,7 @@ func (rr *reviewRepository) GetUserReviews(userID uuid.UUID) (*[]models.Review, 
 
 	var reviews []models.Review
 
-	if err := rr.DB.Where("user_id = ?", userID).Find(&reviews).Error; err != nil {
+	if err := rr.DB.Preload("User").Where("user_id = ?", userID).Find(&reviews).Error; err != nil {
 		return nil, err
 	}
 

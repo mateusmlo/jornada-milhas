@@ -16,7 +16,7 @@ type BaseModel struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
-func (bm *BaseModel) BeforeCreate(tx *gorm.DB) (err error) {
+func (bm *BaseModel) BeforeCreate(_ *gorm.DB) (err error) {
 	bm.ID = uuid.New()
 
 	return

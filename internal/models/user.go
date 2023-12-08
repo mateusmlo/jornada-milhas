@@ -12,13 +12,13 @@ import (
 // User db model
 type User struct {
 	BaseModel
-	Name     string `gorm:"not null,size:100" json:"name"`
-	Email    string `gorm:"not null,size 100" json:"email"`
-	Password string `gorm:"size:70,not null" json:"-"`
-	Reviews  []*Review
+	Name     string    `gorm:"not null,size:100" json:"name"`
+	Email    string    `gorm:"not null,size 100" json:"email"`
+	Password string    `gorm:"size:70,not null" json:"-"`
+	Reviews  []*Review `json:"-"`
 }
 
-func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+func (u *User) BeforeSave(_ *gorm.DB) (err error) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 
 	if err != nil {
