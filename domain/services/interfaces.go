@@ -37,4 +37,5 @@ type AuthService interface {
 	CreateSession(payload dto.AuthDTO, user *models.User) (*AuthPayload, error)
 	Logout(user *models.User) bool
 	validatePasswordHash(password, hash string) bool
+	GenerateTokenPair(userID uuid.UUID) (string, string, error)
 }
