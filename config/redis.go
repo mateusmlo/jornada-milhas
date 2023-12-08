@@ -27,7 +27,7 @@ func NewRedisConnection(env *Env) *rueidis.Client {
 		panic(err)
 	}
 
-	fmt.Println("[CACHE] ✅ Redis client connected...")
+	fmt.Println("[CACHE]         ✅ Redis client connected...")
 
 	return &cli
 }

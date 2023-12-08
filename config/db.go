@@ -24,7 +24,7 @@ func NewDBConnection(env *Env) *gorm.DB {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Println("[DB] ✅ Successfully connected to the database")
+		fmt.Println("[DB]            ✅ Successfully connected to the database")
 	}
 
 	DB.AutoMigrate(models.Review{}, models.User{})
