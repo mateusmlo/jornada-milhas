@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
 	"github.com/mateusmlo/jornada-milhas/internal/models"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,11 +20,11 @@ type AuthPayload struct {
 type authService struct {
 	us UserService
 	rs RefreshService
-	tu tools.TokenUtils
+	tu utils.TokenUtils
 }
 
 // NewAuthService creates new auth service
-func NewAuthService(us UserService, rs RefreshService, tu tools.TokenUtils) AuthService {
+func NewAuthService(us UserService, rs RefreshService, tu utils.TokenUtils) AuthService {
 	return &authService{
 		us: us,
 		rs: rs,

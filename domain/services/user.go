@@ -51,10 +51,13 @@ func (us *userService) FindByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser creates new user
-func (us *userService) CreateUser(u *dto.NewUserDTO) error {
-	err := us.repo.CreateUser(u)
+func (us *userService) CreateUser(u *dto.NewUserDTO) (*models.User, error) {
+	user, err := us.repo.CreateUser(u)
+	if err != nil {
+		return nil, err
+	}
 
-	return err
+	return user, err
 }
 
 // UpdateUser updates a user

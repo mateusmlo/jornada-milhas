@@ -7,16 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 )
 
 type userController struct {
 	svc service.UserService
-	ut  tools.TokenUtils
+	ut  utils.TokenUtils
 }
 
 // NewUserController instantiates new user controller
-func NewUserController(userService service.UserService, ut tools.TokenUtils) UserController {
+func NewUserController(userService service.UserService, ut utils.TokenUtils) UserController {
 	return &userController{
 		svc: userService,
 		ut:  ut,
@@ -93,7 +93,8 @@ func (uc *userController) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	if err := uc.svc.CreateUser(userPayload); err != nil {
+	user, err := uc.svc.CreateUser(userPayload)
+	if err != nil {
 		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -103,7 +104,7 @@ func (uc *userController) CreateUser(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
-		"data": userPayload,
+		"data": user,
 	})
 }
 

@@ -14,7 +14,7 @@ import (
 	"github.com/mateusmlo/jornada-milhas/config"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	repository "github.com/mateusmlo/jornada-milhas/internal/repositories"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 	"go.uber.org/fx"
 )
 
@@ -28,7 +28,7 @@ func main() {
 		repository.Module,
 		service.Module,
 		routes.Module,
-		tools.Module,
+		utils.Module,
 		fx.Invoke(startServer),
 	)
 
@@ -61,14 +61,23 @@ func startServer(
 				return err
 			}
 
-			go srv.Serve(ln) // process an incoming request in a go routine
+			go func() {
+				err := srv.Serve(ln)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}() // process an incoming request in a go routine
 
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
 			fmt.Println("Stopping server...")
 
-			srv.Shutdown(ctx)
+			err := srv.Shutdown(ctx)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
 
 			return nil
 		},

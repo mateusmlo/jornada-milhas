@@ -7,17 +7,17 @@ import (
 	"github.com/gin-gonic/gin"
 	services "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 )
 
 type reviewController struct {
 	svc services.ReviewService
 	us  services.UserService
-	tu  tools.TokenUtils
+	tu  utils.TokenUtils
 }
 
 // NewReviewController provides new review controller struct
-func NewReviewController(rs services.ReviewService, tu tools.TokenUtils, us services.UserService) ReviewController {
+func NewReviewController(rs services.ReviewService, tu utils.TokenUtils, us services.UserService) ReviewController {
 	return &reviewController{
 		svc: rs,
 		tu:  tu,

@@ -22,6 +22,7 @@ type Env struct {
 	RefreshTokenTTL    string `mapstructure:"REFRESH_TTL"`
 	RedisHost          string `mapstructure:"REDIS_HOST"`
 	RedisPort          string `mapstructure:"REDIS_PORT"`
+	RedisTTL           string `mapstructure:"REDIS_TTL"`
 }
 
 // LoadEnvs loads environment variables from root .env file

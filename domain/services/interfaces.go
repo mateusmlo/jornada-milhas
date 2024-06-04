@@ -11,7 +11,7 @@ type UserService interface {
 	GetAllUsers() ([]*models.User, error)
 	GetUserByUUID(id string) (*models.User, error)
 	FindByEmail(email string) (*models.User, error)
-	CreateUser(u *dto.NewUserDTO) error
+	CreateUser(u *dto.NewUserDTO) (*models.User, error)
 	UpdateUser(id string, payload dto.UpdateUserDTO) error
 	DeactivateUser(id string) (int64, error)
 }

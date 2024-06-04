@@ -10,7 +10,7 @@ type UserRepository interface {
 	GetAllUsers() ([]*models.User, error)
 	FindByUUID(id uuid.UUID) (*models.User, error)
 	FindByEmail(email string) (*models.User, error)
-	CreateUser(u *dto.NewUserDTO) error
+	CreateUser(u *dto.NewUserDTO) (*models.User, error)
 	UpdateUser(id uuid.UUID, u dto.UpdateUserDTO) error
 	DeactivateUser(id uuid.UUID) (int64, error)
 }

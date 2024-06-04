@@ -7,21 +7,21 @@ import (
 	"github.com/gin-gonic/gin"
 	service "github.com/mateusmlo/jornada-milhas/domain/services"
 	"github.com/mateusmlo/jornada-milhas/internal/dto"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 )
 
 type authController struct {
 	as service.AuthService
 	rs service.RefreshService
 	us service.UserService
-	tu tools.TokenUtils
+	tu utils.TokenUtils
 }
 
 // NewAuthController creates new controller
 func NewAuthController(
 	as service.AuthService,
 	rs service.RefreshService,
-	tu tools.TokenUtils,
+	tu utils.TokenUtils,
 	us service.UserService,
 ) AuthController {
 	return &authController{

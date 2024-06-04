@@ -17,7 +17,7 @@ type userRepository struct {
 
 func RecoverPanic(ctx context.Context) {
 	if r := recover(); r != nil {
-		fmt.Println(ctx, "😵 Recovered from panic!")
+		fmt.Println(ctx, "🫨 Recovered from panic!")
 	}
 }
 
@@ -69,8 +69,8 @@ func (ur *userRepository) FindByEmail(email string) (*models.User, error) {
 }
 
 // CreateUser creates new user
-func (ur *userRepository) CreateUser(u *dto.NewUserDTO) error {
-	user := models.User{
+func (ur *userRepository) CreateUser(u *dto.NewUserDTO) (*models.User, error) {
+	user := &models.User{
 		Name:     u.Name,
 		Email:    u.Email,
 		Password: u.Password,
@@ -86,16 +86,16 @@ func (ur *userRepository) CreateUser(u *dto.NewUserDTO) error {
 	if err := tx.Create(&user).Error; err != nil {
 		fmt.Println(err)
 		tx.Rollback()
-		return err
+		return nil, err
 	}
 
 	if err := tx.Commit().Error; err != nil {
 		fmt.Println(err)
 		tx.Rollback()
-		return err
+		return nil, err
 	}
 
-	return nil
+	return user, nil
 }
 
 // UpdateUser updates user data

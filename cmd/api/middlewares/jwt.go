@@ -6,15 +6,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mateusmlo/jornada-milhas/config"
-	"github.com/mateusmlo/jornada-milhas/tools"
+	"github.com/mateusmlo/jornada-milhas/utils"
 )
 
 type JWTMiddleware struct {
 	env *config.Env
-	tu  tools.TokenUtils
+	tu  utils.TokenUtils
 }
 
-func NewJWTAuthMiddleware(env *config.Env, tu tools.TokenUtils) AuthMiddleware {
+func NewJWTAuthMiddleware(env *config.Env, tu utils.TokenUtils) AuthMiddleware {
 	return &JWTMiddleware{
 		env: env,
 		tu:  tu,
