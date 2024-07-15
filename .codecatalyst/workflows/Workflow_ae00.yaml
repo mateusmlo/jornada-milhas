@@ -22,7 +22,7 @@ Actions:
       Type: EC2 # Defines the action's properties.
     Configuration:
       RepositoryName: jmilhas-api
-      AWSRegion: sa-east-1
+      AWSRegion: us-east-1
       PublicRepository: false
       ImageScanningConfiguration: false
   DeployToAWSAppRunner_8c:
@@ -37,7 +37,7 @@ Actions:
       Tags: "[]"
       StackName: jmilhas-stack
       Wait: true
-      AWSRegion: sa-east-1
+      AWSRegion: us-east-1
       Port: 3333
       ImageIdentifier: 975334464943.dkr.ecr.sa-east-1.amazonaws.com/jmilhas-api:5060e2c
     DependsOn:
