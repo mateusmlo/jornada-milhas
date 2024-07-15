@@ -58,3 +58,19 @@ Actions:
       Type: EC2
     Packages:
       ExportAuthorizationToken: true
+  DeployAWSCloudFormationStack_73:
+    Identifier: aws/cfn-deploy@v1.1.0 # Defines the action's properties.
+    Configuration:
+      template: .aws/cloudform.yaml
+      region: sa-east-1
+      name: jmilhas-stack
+    # Required; You can use an environment to access AWS resources.
+    Environment:
+      Name: jmilhas-env
+    DependsOn:
+      - Build_80
+    # Specifies the source and/or artifacts to pass to the action as input.
+    Inputs:
+      # Optional
+      Sources:
+        - WorkflowSource # This specifies that the action requires this Workflow as a source
