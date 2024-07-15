@@ -35,8 +35,10 @@ Actions:
       Type: EC2
     Configuration:
       Tags: "[]"
+      StackName: jmilhas-stack
       Wait: true
       AWSRegion: sa-east-1
       Port: 3333
+      ImageIdentifier: 975334464943.dkr.ecr.sa-east-1.amazonaws.com/jmilhas-api:5060e2c
     DependsOn:
       - PushToAmazonECR_e5
