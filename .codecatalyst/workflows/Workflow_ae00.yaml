@@ -7,70 +7,35 @@ Triggers:
     Branches:
       - main
 Actions:
-  Build_80:
+  PushToAmazonECR_e5:
     # Identifies the action. Do not modify this value.
-    Identifier: aws/build@v1.0.0
-    Inputs:
-      Sources:
-        - WorkflowSource
-      Variables:
-        - Name: SERVER_PORT
-          Value: "3335"
-        - Name: GIN_MODE
-          Value: release
-        - Name: DB_HOST
-          Value: jmilhas-db.c9yqesgqqcvf.us-west-2.rds.amazonaws.com
-        - Name: DB_PORT
-          Value: "5432"
-        - Name: DB_USER
-          Value: jornada_admin
-        - Name: DB_PASSWORD
-          Value: parangaricotirimicuaro
-        - Name: DB_NAME
-          Value: jmilhas-db
-        - Name: ACCESS_TOKEN_TTL
-          Value: "2"
-        - Name: ACCESS_TOKEN_SECRET
-          Value: parangaricotirimicuaro
-        - Name: REFRESH_TTL
-          Value: "5"
-        - Name: REFRESH_SECRET
-          Value: parangaricotirimicuaro
-    Outputs:
-      # Optional; Automatically discover reports for popular test frameworks
-      AutoDiscoverReports:
-        Enabled: true
-        # Use as prefix for the report files
-        ReportNamePrefix: rpt
-    # Defines the action's properties.
-    Configuration:
-      # Required - Steps are sequential instructions that run shell commands
-      Steps:
-        - Run: echo "Hello, World!"
-        - Run: echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" >> report.xml
-        - Run: echo "<testsuite tests=\"1\" name=\"TestAgentJunit\" >" >> report.xml
-        - Run: echo "<testcase classname=\"TestAgentJunit\" name=\"Dummy
-            Test\"/></testsuite>" >> report.xml
-      Container:
-        Registry: CODECATALYST
-        Image: CodeCatalystLinux_x86_64:2024_03
-    Compute:
-      Type: EC2
-    Packages:
-      ExportAuthorizationToken: true
-  DeployAWSCloudFormationStack_73:
-    Identifier: aws/cfn-deploy@v1.1.0 # Defines the action's properties.
-    Configuration:
-      template: .aws/cloudform.yaml
-      region: sa-east-1
-      name: jmilhas-stack
+    Identifier: codecatalyst-labs/push-to-ecr@v1.1.0
     # Required; You can use an environment to access AWS resources.
     Environment:
       Name: jmilhas-env
-    DependsOn:
-      - Build_80
     # Specifies the source and/or artifacts to pass to the action as input.
     Inputs:
       # Optional
       Sources:
         - WorkflowSource # This specifies that the action requires this Workflow as a source
+    Compute:
+      Type: EC2 # Defines the action's properties.
+    Configuration:
+      RepositoryName: jmilhas-api
+      PublicRepository: false
+      ImageScanningConfiguration: false
+  DeployToAWSAppRunner_8c:
+    # Identifies the action. Do not modify this value.
+    Identifier: codecatalyst-labs/deploy-to-app-runner@v1.1.0
+    # Required; You can use an environment to access AWS resources.
+    Environment:
+      Name: jmilhas-env
+    Compute:
+      Type: EC2
+    Configuration:
+      Tags: "[]"
+      Wait: true
+      AWSRegion: sa-east-1
+      Port: 3333
+    DependsOn:
+      - PushToAmazonECR_e5
