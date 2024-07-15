@@ -22,6 +22,7 @@ Actions:
       Type: EC2 # Defines the action's properties.
     Configuration:
       RepositoryName: jmilhas-api
+      AWSRegion: sa-east-1
       PublicRepository: false
       ImageScanningConfiguration: false
   DeployToAWSAppRunner_8c:
