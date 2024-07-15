@@ -25,17 +25,9 @@ type ReviewService interface {
 	DeleteReview(reviewID string, userID uuid.UUID) (int64, error)
 }
 
-// RefreshService provides refresh token resources
-type RefreshService interface {
-	GetRefreshToken(userID string) (string, error)
-	SetRefreshToken(tkn, userID string) error
-	DeleteRefreshToken(userID string) bool
-}
-
 // AuthService provides authentication resources
 type AuthService interface {
 	CreateSession(payload dto.AuthDTO, user *models.User) (*AuthPayload, error)
-	Logout(user *models.User) bool
 	validatePasswordHash(password, hash string) bool
-	GenerateTokenPair(userID uuid.UUID) (string, string, error)
+	GenerateTokenPair(userID uuid.UUID) (string, error)
 }

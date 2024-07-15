@@ -32,6 +32,4 @@ func (r *AuthRouter) SetupRoutes() {
 	api := r.rh.Gin.Group("/v1/auth")
 
 	api.POST("/login", r.ac.SignIn)
-	api.GET("/logout", r.md.ValidateRefreshToken(), r.ac.Logout)
-	api.GET("/refresh", r.md.ValidateRefreshToken(), r.ac.RenewTokenPair)
 }

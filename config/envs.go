@@ -2,7 +2,9 @@
 package config
 
 import (
+	"github.com/go-viper/mapstructure/v2"
 	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -25,19 +27,41 @@ type Env struct {
 	RedisTTL           string `mapstructure:"REDIS_TTL"`
 }
 
-// LoadEnvs loads environment variables from root .env file
+// LoadEnvs loads environment variables from root dev.env file
 func LoadEnvs() *Env {
 	env := Env{}
-	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal("☠️ failed to read envs")
+	if os.Getenv("GIN_MODE") != "release" {
+		viper.SetConfigFile("dev.env")
+
+		err := viper.ReadInConfig()
+		if err != nil {
+			log.Fatal("☠️ failed to read envs", err)
+		}
+
+		err = viper.Unmarshal(&env)
+		if err != nil {
+			log.Fatal("☠️ failed to load envs", err)
+		}
+		return &env
 	}
 
-	err = viper.Unmarshal(&env)
+	viper.AutomaticEnv()
+
+	envKeysMap := &map[string]interface{}{}
+	if err := mapstructure.Decode(env, &envKeysMap); err != nil {
+		log.Fatal(err)
+	}
+
+	for k := range *envKeysMap {
+		if bindErr := viper.BindEnv(k); bindErr != nil {
+			log.Fatal(bindErr)
+		}
+	}
+
+	err := viper.Unmarshal(&env)
 	if err != nil {
-		log.Fatal("☠️ failed to load envs")
+		log.Fatal("☠️ failed to load envs", err)
 	}
 
 	return &env

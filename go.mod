@@ -6,10 +6,8 @@ toolchain go1.22.3
 
 require (
 	ariga.io/atlas-provider-gorm v0.4.0
-	github.com/DATA-DOG/go-sqlmock v1.5.1
-	github.com/redis/rueidis v1.0.21
+	github.com/go-viper/mapstructure/v2 v2.0.0
 	github.com/spf13/viper v1.16.0
-	github.com/stretchr/testify v1.8.4
 	go.uber.org/fx v1.20.0
 	go.uber.org/zap v1.26.0
 	golang.org/x/crypto v0.24.0
@@ -45,7 +43,6 @@ require (
 	github.com/microsoft/go-mssqldb v1.7.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
@@ -62,7 +59,6 @@ require (
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gin-gonic/gin v1.9.1
 	github.com/golang-jwt/jwt/v5 v5.2.0

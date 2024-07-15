@@ -37,20 +37,3 @@ func (m *JWTMiddleware) ValidateAccessToken() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
-
-func (m *JWTMiddleware) ValidateRefreshToken() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		err := m.tu.ValidateRefreshToken(ctx)
-		if err != nil {
-			fmt.Println(err)
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
-			ctx.Abort()
-
-			return
-		}
-
-		ctx.Next()
-	}
-}

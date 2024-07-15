@@ -43,26 +43,6 @@ func (tu *tokenUtils) GenerateAccessToken(userID uuid.UUID) (string, error) {
 	return tkn.SignedString([]byte(tu.env.AccessTokenSecret))
 }
 
-func (tu *tokenUtils) GenerateRefreshToken(userID uuid.UUID) (string, error) {
-	ttl, err := strconv.Atoi(tu.env.RefreshTokenTTL)
-	if err != nil {
-		fmt.Println(err)
-
-		return "", err
-	}
-
-	claims := jwt.MapClaims{
-		"sub": userID,
-		"exp": time.Now().Add(time.Hour * 24 * time.Duration(ttl)).Unix(),
-		"iss": "ALTIMIT Corp.",
-		"iat": time.Now().Unix(),
-	}
-
-	tkn := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return tkn.SignedString([]byte(tu.env.RefreshTokenSecret))
-}
-
 func (tu *tokenUtils) ValidateAccessToken(ctx *gin.Context) error {
 	tkn := tu.ExtractToken(ctx)
 
@@ -71,23 +51,6 @@ func (tu *tokenUtils) ValidateAccessToken(ctx *gin.Context) error {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(tu.env.AccessTokenSecret), nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (tu *tokenUtils) ValidateRefreshToken(ctx *gin.Context) error {
-	tkn := tu.ExtractToken(ctx)
-
-	_, err := jwt.Parse(tkn, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-		}
-		return []byte(tu.env.RefreshTokenSecret), nil
 	})
 
 	if err != nil {

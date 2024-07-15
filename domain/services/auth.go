@@ -13,21 +13,18 @@ import (
 
 // AuthPayload authentication credentials payload
 type AuthPayload struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken string `json:"access_token"`
 }
 
 type authService struct {
 	us UserService
-	rs RefreshService
 	tu utils.TokenUtils
 }
 
 // NewAuthService creates new auth service
-func NewAuthService(us UserService, rs RefreshService, tu utils.TokenUtils) AuthService {
+func NewAuthService(us UserService, tu utils.TokenUtils) AuthService {
 	return &authService{
 		us: us,
-		rs: rs,
 		tu: tu,
 	}
 }
@@ -36,30 +33,18 @@ func NewAuthService(us UserService, rs RefreshService, tu utils.TokenUtils) Auth
 func (as *authService) CreateSession(payload dto.AuthDTO, user *models.User) (*AuthPayload, error) {
 	validPassword := as.validatePasswordHash(payload.Password, user.Password)
 	if !validPassword {
-		return nil, errors.New("Invalid email or password")
+		return nil, errors.New("invalid email or password")
 	}
 
-	aTkn, rTkn, err := as.GenerateTokenPair(user.ID)
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	err = as.rs.SetRefreshToken(rTkn, user.ID.String())
+	aTkn, err := as.GenerateTokenPair(user.ID)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
 	return &AuthPayload{
-		AccessToken:  aTkn,
-		RefreshToken: rTkn,
+		AccessToken: aTkn,
 	}, nil
-}
-
-// Logout attempts to logout user
-func (as *authService) Logout(user *models.User) bool {
-	return as.rs.DeleteRefreshToken(user.ID.String())
 }
 
 func (as *authService) validatePasswordHash(password, hash string) bool {
@@ -68,18 +53,12 @@ func (as *authService) validatePasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func (as *authService) GenerateTokenPair(userID uuid.UUID) (string, string, error) {
+func (as *authService) GenerateTokenPair(userID uuid.UUID) (string, error) {
 	tkn, err := as.tu.GenerateAccessToken(userID)
 	if err != nil {
 		fmt.Println(err)
-		return "", "", err
+		return "", err
 	}
 
-	rTkn, err := as.tu.GenerateRefreshToken(userID)
-	if err != nil {
-		fmt.Println(err)
-		return "", "", err
-	}
-
-	return tkn, rTkn, nil
+	return tkn, nil
 }

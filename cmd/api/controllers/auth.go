@@ -12,7 +12,6 @@ import (
 
 type authController struct {
 	as service.AuthService
-	rs service.RefreshService
 	us service.UserService
 	tu utils.TokenUtils
 }
@@ -20,13 +19,11 @@ type authController struct {
 // NewAuthController creates new controller
 func NewAuthController(
 	as service.AuthService,
-	rs service.RefreshService,
 	tu utils.TokenUtils,
 	us service.UserService,
 ) AuthController {
 	return &authController{
 		as: as,
-		rs: rs,
 		tu: tu,
 		us: us,
 	}
@@ -71,26 +68,7 @@ func (ac *authController) SignIn(ctx *gin.Context) {
 	})
 }
 
-// Logout logs out user
-func (ac *authController) Logout(ctx *gin.Context) {
-	sub, err := ac.tu.ExtractTokenSub(ctx, true)
-	if err != nil {
-		ctx.JSON(http.StatusForbidden, gin.H{
-			"error": err,
-		})
-
-		return
-	}
-
-	res := ac.rs.DeleteRefreshToken(sub.String())
-
-	ctx.JSON(http.StatusAccepted, gin.H{
-		"message": "logged out succesfully",
-		"status":  res,
-	})
-}
-
-// RenewRefreshToken renews user token pair if refresh still valid
+// RenewTokenPair renews user token pair if refresh still valid
 func (ac *authController) RenewTokenPair(ctx *gin.Context) {
 	sub, err := ac.tu.ExtractTokenSub(ctx, true)
 	if err != nil {
@@ -101,18 +79,7 @@ func (ac *authController) RenewTokenPair(ctx *gin.Context) {
 		return
 	}
 
-	ac.rs.DeleteRefreshToken(sub.String())
-
-	newAccessTkn, newRefreshTkn, err := ac.as.GenerateTokenPair(sub)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
-
-		return
-	}
-
-	err = ac.rs.SetRefreshToken(newRefreshTkn, sub.String())
+	newAccessTkn, err := ac.as.GenerateTokenPair(sub)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -122,8 +89,7 @@ func (ac *authController) RenewTokenPair(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusAccepted, gin.H{
-		"message":       "token renewed succesfully",
-		"access_token":  newAccessTkn,
-		"refresh_token": newRefreshTkn,
+		"message":      "token renewed succesfully",
+		"access_token": newAccessTkn,
 	})
 }

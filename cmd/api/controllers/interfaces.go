@@ -5,7 +5,6 @@ import "github.com/gin-gonic/gin"
 // AuthController provides authentication resources
 type AuthController interface {
 	SignIn(ctx *gin.Context)
-	Logout(ctx *gin.Context)
 	RenewTokenPair(ctx *gin.Context)
 }
 

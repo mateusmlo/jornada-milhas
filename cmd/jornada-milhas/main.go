@@ -47,7 +47,7 @@ func startServer(
 	ar.SetupRoutes()
 	rr.SetupRoutes()
 
-	fmt.Println("\nStaring server...")
+	fmt.Println("\nStarting server...")
 	port := env.ServerPort
 
 	srv := &http.Server{Addr: ":" + port, Handler: rh.Gin}
