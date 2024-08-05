@@ -2,11 +2,8 @@
 package config
 
 import (
-	"github.com/go-viper/mapstructure/v2"
-	"log"
-	"os"
-
 	"github.com/spf13/viper"
+	"log"
 )
 
 // Env contains all environment variables as friendly props
@@ -31,35 +28,14 @@ type Env struct {
 func LoadEnvs() *Env {
 	env := Env{}
 
-	if os.Getenv("GIN_MODE") != "release" {
-		viper.SetConfigFile("dev.env")
+	viper.SetConfigFile("dev.env")
 
-		err := viper.ReadInConfig()
-		if err != nil {
-			log.Fatal("☠️ failed to read envs", err)
-		}
-
-		err = viper.Unmarshal(&env)
-		if err != nil {
-			log.Fatal("☠️ failed to load envs", err)
-		}
-		return &env
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Fatal("☠️ failed to read envs", err)
 	}
 
-	viper.AutomaticEnv()
-
-	envKeysMap := &map[string]interface{}{}
-	if err := mapstructure.Decode(env, &envKeysMap); err != nil {
-		log.Fatal(err)
-	}
-
-	for k := range *envKeysMap {
-		if bindErr := viper.BindEnv(k); bindErr != nil {
-			log.Fatal(bindErr)
-		}
-	}
-
-	err := viper.Unmarshal(&env)
+	err = viper.Unmarshal(&env)
 	if err != nil {
 		log.Fatal("☠️ failed to load envs", err)
 	}
